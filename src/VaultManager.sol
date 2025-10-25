@@ -78,6 +78,7 @@ contract VaultManager is ReentrancyGuard, Ownable {
     event Borrowed(address indexed user, uint256 amount);
     event Repaid(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
+    event OINRPurchased(address indexed user, uint256 oinrAmount, uint256 usdcPaid);
     event CollateralizationRatioUpdated(uint256 newRatio);
     event PriceOracleUpdated(
         address indexed oldOracle,
@@ -169,6 +170,36 @@ contract VaultManager is ReentrancyGuard, Ownable {
         vaultEngine.decreaseDebt(msg.sender, amount);
 
         emit Repaid(msg.sender, amount);
+    }
+
+    /// @notice Buy oINR with USDC (for users who spent their borrowed oINR and need to buy back)
+    /// @param oinrAmount Amount of oINR to buy (18 decimals)
+    /// @dev User pays USDC at oracle price to get oINR, then can repay their debt
+    function buyOINR(uint256 oinrAmount) external nonReentrant {
+        require(oinrAmount > 0, "Amount must be > 0");
+        require(address(priceOracle) != address(0), "Oracle not set");
+
+        // Get USDC price in INR (e.g., 83 INR per USDC with 18 decimals precision)
+        uint256 usdcPriceInINR = priceOracle.getPrice(address(collateralToken));
+        require(usdcPriceInINR > 0, "Invalid price");
+
+        // Calculate required USDC amount
+        // Formula: usdcAmount = (oinrAmount * 1e6) / usdcPriceInINR
+        // Example: Buy 83 oINR → Need 1 USDC (1e6)
+        //          usdcAmount = (83e18 * 1e6) / 83e18 = 1e6
+        uint256 usdcAmount = (oinrAmount * (10 ** collateralDecimals)) / usdcPriceInINR;
+        require(usdcAmount > 0, "Amount too small");
+
+        // Transfer USDC from user to this contract
+        require(
+            collateralToken.transferFrom(msg.sender, address(this), usdcAmount),
+            "USDC transfer failed"
+        );
+
+        // Mint oINR to user
+        oinrToken.mint(msg.sender, oinrAmount);
+
+        emit OINRPurchased(msg.sender, oinrAmount, usdcAmount);
     }
 
     /// @notice Withdraw collateral from vault

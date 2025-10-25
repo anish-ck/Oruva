@@ -72,7 +72,22 @@ async function borrow(amount) {
 }
 ```
 
-**c) Repay Debt**
+**c) Buy oINR with USDC** (For users who spent their oINR)
+```javascript
+// User buys oINR with USDC to repay debt
+// Amount in oINR decimals (18 decimals)
+async function buyOINR(oinrAmount) {
+  // First approve USDC
+  const usdcPrice = 83e18; // 83 INR per USDC
+  const requiredUSDC = (oinrAmount * 1e6) / usdcPrice;
+  await mockUSDC.approve(VAULT_MANAGER, requiredUSDC);
+  
+  // Buy oINR
+  await vaultManager.buyOINR(oinrAmount);
+}
+```
+
+**d) Repay Debt**
 ```javascript
 // User repays oINR
 async function repay(amount) {
@@ -80,7 +95,7 @@ async function repay(amount) {
 }
 ```
 
-**d) Withdraw Collateral**
+**e) Withdraw Collateral**
 ```javascript
 // User withdraws USDC
 async function withdraw(amount) {
@@ -88,7 +103,7 @@ async function withdraw(amount) {
 }
 ```
 
-**e) Get Vault Info (Read-only)**
+**f) Get Vault Info (Read-only)**
 ```javascript
 async function getVaultInfo(userAddress) {
   const info = await vaultManager.getVaultInfo(userAddress);
@@ -102,7 +117,7 @@ async function getVaultInfo(userAddress) {
 }
 ```
 
-**f) Check Borrow Capacity (Read-only)**
+**g) Check Borrow Capacity (Read-only)**
 ```javascript
 async function checkBorrowCapacity(userAddress, amount) {
   const result = await vaultManager.checkBorrowCapacity(userAddress, amount);
@@ -110,6 +125,37 @@ async function checkBorrowCapacity(userAddress, amount) {
     canBorrow: result[0],    // true/false
     maxBorrowable: result[1] // Max oINR amount (18 decimals)
   };
+}
+```
+
+---
+
+## 🔄 Complete Repayment Flow
+
+### When user spends oINR and needs to repay:
+
+```javascript
+// Full repayment flow
+async function buyAndRepayDebt(debtAmount) {
+  // 1. Calculate required USDC (assuming 83 INR per USDC)
+  const usdcPrice = 83e18; // From oracle
+  const requiredUSDC = (debtAmount * 1e6n) / usdcPrice;
+  
+  // 2. Check USDC balance
+  const usdcBalance = await mockUSDC.balanceOf(userAddress);
+  if (usdcBalance < requiredUSDC) {
+    throw new Error("Insufficient USDC to buy oINR");
+  }
+  
+  // 3. Buy oINR with USDC
+  await mockUSDC.approve(VAULT_MANAGER, requiredUSDC);
+  await vaultManager.buyOINR(debtAmount);
+  
+  // 4. Repay debt
+  await oinr.approve(VAULT_MANAGER, debtAmount);
+  await vaultManager.repay(debtAmount);
+  
+  console.log("Debt repaid successfully!");
 }
 ```
 
