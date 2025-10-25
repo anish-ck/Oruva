@@ -78,7 +78,11 @@ contract VaultManager is ReentrancyGuard, Ownable {
     event Borrowed(address indexed user, uint256 amount);
     event Repaid(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
-    event OINRPurchased(address indexed user, uint256 oinrAmount, uint256 usdcPaid);
+    event OINRPurchased(
+        address indexed user,
+        uint256 oinrAmount,
+        uint256 usdcPaid
+    );
     event CollateralizationRatioUpdated(uint256 newRatio);
     event PriceOracleUpdated(
         address indexed oldOracle,
@@ -187,7 +191,8 @@ contract VaultManager is ReentrancyGuard, Ownable {
         // Formula: usdcAmount = (oinrAmount * 1e6) / usdcPriceInINR
         // Example: Buy 83 oINR → Need 1 USDC (1e6)
         //          usdcAmount = (83e18 * 1e6) / 83e18 = 1e6
-        uint256 usdcAmount = (oinrAmount * (10 ** collateralDecimals)) / usdcPriceInINR;
+        uint256 usdcAmount = (oinrAmount * (10 ** collateralDecimals)) /
+            usdcPriceInINR;
         require(usdcAmount > 0, "Amount too small");
 
         // Transfer USDC from user to this contract

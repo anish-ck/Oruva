@@ -24,7 +24,7 @@ contract VaultManagerTest is Test {
     address public owner = address(this);
 
     // Constants
-    uint256 constant INITIAL_USDC = 10000 * 10**6; // 10,000 USDC
+    uint256 constant INITIAL_USDC = 10000 * 10 ** 6; // 10,000 USDC
     uint256 constant USDC_PRICE = 83e18; // 83 INR per USDC
     uint256 constant MIN_RATIO = 15000; // 150%
 
@@ -32,7 +32,11 @@ contract VaultManagerTest is Test {
     event Borrowed(address indexed user, uint256 amount);
     event Repaid(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
-    event OINRPurchased(address indexed user, uint256 oinrAmount, uint256 usdcPaid);
+    event OINRPurchased(
+        address indexed user,
+        uint256 oinrAmount,
+        uint256 usdcPaid
+    );
 
     function setUp() public {
         // Deploy contracts in correct order
@@ -80,7 +84,7 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testDeposit() public {
-        uint256 depositAmount = 1000 * 10**6; // 1000 USDC
+        uint256 depositAmount = 1000 * 10 ** 6; // 1000 USDC
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -111,13 +115,13 @@ contract VaultManagerTest is Test {
     function testDepositWithoutApproval() public {
         vm.startPrank(user1);
         vm.expectRevert();
-        vaultManager.deposit(1000 * 10**6);
+        vaultManager.deposit(1000 * 10 ** 6);
         vm.stopPrank();
     }
 
     function testMultipleDeposits() public {
-        uint256 deposit1 = 500 * 10**6;
-        uint256 deposit2 = 300 * 10**6;
+        uint256 deposit1 = 500 * 10 ** 6;
+        uint256 deposit2 = 300 * 10 ** 6;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), deposit1 + deposit2);
@@ -135,8 +139,8 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testBorrow() public {
-        uint256 depositAmount = 1000 * 10**6; // 1000 USDC
-        uint256 borrowAmount = 50000 * 10**18; // 50,000 oINR
+        uint256 depositAmount = 1000 * 10 ** 6; // 1000 USDC
+        uint256 borrowAmount = 50000 * 10 ** 18; // 50,000 oINR
 
         // Deposit first
         vm.startPrank(user1);
@@ -158,9 +162,9 @@ contract VaultManagerTest is Test {
     }
 
     function testBorrowMaxAmount() public {
-        uint256 depositAmount = 1000 * 10**6; // 1000 USDC
+        uint256 depositAmount = 1000 * 10 ** 6; // 1000 USDC
         // Max borrow = (1000 * 83 * 10000) / 15000 = 55,333.33 oINR
-        uint256 maxBorrow = 55333 * 10**18;
+        uint256 maxBorrow = 55333 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -173,8 +177,8 @@ contract VaultManagerTest is Test {
     }
 
     function testBorrowExceedsCollateral() public {
-        uint256 depositAmount = 1000 * 10**6; // 1000 USDC
-        uint256 excessiveBorrow = 60000 * 10**18; // Too much!
+        uint256 depositAmount = 1000 * 10 ** 6; // 1000 USDC
+        uint256 excessiveBorrow = 60000 * 10 ** 18; // Too much!
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -188,12 +192,12 @@ contract VaultManagerTest is Test {
     function testBorrowWithoutCollateral() public {
         vm.startPrank(user1);
         vm.expectRevert("No collateral deposited");
-        vaultManager.borrow(1000 * 10**18);
+        vaultManager.borrow(1000 * 10 ** 18);
         vm.stopPrank();
     }
 
     function testBorrowZeroAmount() public {
-        uint256 depositAmount = 1000 * 10**6;
+        uint256 depositAmount = 1000 * 10 ** 6;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -209,8 +213,8 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testRepay() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 50000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 50000 * 10 ** 18;
 
         // Setup: Deposit and borrow
         vm.startPrank(user1);
@@ -236,9 +240,9 @@ contract VaultManagerTest is Test {
     }
 
     function testPartialRepay() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 50000 * 10**18;
-        uint256 repayAmount = 20000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 50000 * 10 ** 18;
+        uint256 repayAmount = 20000 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -254,9 +258,9 @@ contract VaultManagerTest is Test {
     }
 
     function testRepayExceedsDebt() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 50000 * 10**18;
-        uint256 excessRepay = 60000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 50000 * 10 ** 18;
+        uint256 excessRepay = 60000 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -272,7 +276,7 @@ contract VaultManagerTest is Test {
     function testRepayWithoutDebt() public {
         vm.startPrank(user1);
         vm.expectRevert("Repay amount exceeds debt");
-        vaultManager.repay(1000 * 10**18);
+        vaultManager.repay(1000 * 10 ** 18);
         vm.stopPrank();
     }
 
@@ -281,7 +285,7 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testWithdraw() public {
-        uint256 depositAmount = 1000 * 10**6;
+        uint256 depositAmount = 1000 * 10 ** 6;
 
         // Deposit
         vm.startPrank(user1);
@@ -304,8 +308,8 @@ contract VaultManagerTest is Test {
     }
 
     function testWithdrawWithDebt() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 50000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 50000 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -319,9 +323,9 @@ contract VaultManagerTest is Test {
     }
 
     function testPartialWithdrawWithDebt() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 40000 * 10**18;
-        uint256 withdrawAmount = 200 * 10**6; // Small withdrawal
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 40000 * 10 ** 18;
+        uint256 withdrawAmount = 200 * 10 ** 6; // Small withdrawal
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -337,7 +341,7 @@ contract VaultManagerTest is Test {
     }
 
     function testWithdrawExceedsCollateral() public {
-        uint256 depositAmount = 1000 * 10**6;
+        uint256 depositAmount = 1000 * 10 ** 6;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -353,8 +357,8 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testBuyOINR() public {
-        uint256 oinrAmount = 8300 * 10**18; // 8,300 oINR
-        uint256 expectedUSDC = 100 * 10**6; // Should cost 100 USDC
+        uint256 oinrAmount = 8300 * 10 ** 18; // 8,300 oINR
+        uint256 expectedUSDC = 100 * 10 ** 6; // Should cost 100 USDC
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), expectedUSDC);
@@ -373,8 +377,8 @@ contract VaultManagerTest is Test {
     }
 
     function testBuyOINRLargeAmount() public {
-        uint256 oinrAmount = 83000 * 10**18; // 83,000 oINR
-        uint256 expectedUSDC = 1000 * 10**6; // 1000 USDC
+        uint256 oinrAmount = 83000 * 10 ** 18; // 83,000 oINR
+        uint256 expectedUSDC = 1000 * 10 ** 6; // 1000 USDC
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), expectedUSDC);
@@ -385,8 +389,8 @@ contract VaultManagerTest is Test {
     }
 
     function testBuyOINRSmallAmount() public {
-        uint256 oinrAmount = 83 * 10**18; // 83 oINR
-        uint256 expectedUSDC = 1 * 10**6; // 1 USDC
+        uint256 oinrAmount = 83 * 10 ** 18; // 83 oINR
+        uint256 expectedUSDC = 1 * 10 ** 6; // 1 USDC
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), expectedUSDC);
@@ -399,7 +403,7 @@ contract VaultManagerTest is Test {
     function testBuyOINRWithoutApproval() public {
         vm.startPrank(user1);
         vm.expectRevert();
-        vaultManager.buyOINR(8300 * 10**18);
+        vaultManager.buyOINR(8300 * 10 ** 18);
         vm.stopPrank();
     }
 
@@ -408,8 +412,8 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testCompleteUserFlow() public {
-        uint256 depositAmount = 1000 * 10**6; // 1000 USDC
-        uint256 borrowAmount = 50000 * 10**18; // 50,000 oINR
+        uint256 depositAmount = 1000 * 10 ** 6; // 1000 USDC
+        uint256 borrowAmount = 50000 * 10 ** 18; // 50,000 oINR
 
         vm.startPrank(user1);
 
@@ -426,7 +430,7 @@ contract VaultManagerTest is Test {
         assertEq(oinrToken.balanceOf(user1), 0);
 
         // 4. Buy back oINR
-        uint256 requiredUSDC = (borrowAmount * 10**6) / USDC_PRICE;
+        uint256 requiredUSDC = (borrowAmount * 10 ** 6) / USDC_PRICE;
         mockUSDC.approve(address(vaultManager), requiredUSDC);
         vaultManager.buyOINR(borrowAmount);
 
@@ -449,8 +453,8 @@ contract VaultManagerTest is Test {
     }
 
     function testMultipleUsers() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 40000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 40000 * 10 ** 18;
 
         // User 1 deposits and borrows
         vm.startPrank(user1);
@@ -485,8 +489,8 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testGetVaultInfo() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 borrowAmount = 50000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 borrowAmount = 50000 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -504,7 +508,7 @@ contract VaultManagerTest is Test {
 
         assertEq(collateral, depositAmount);
         assertEq(debt, borrowAmount);
-        assertEq(collateralValueINR, 83000 * 10**18); // 1000 USDC * 83
+        assertEq(collateralValueINR, 83000 * 10 ** 18); // 1000 USDC * 83
         assertEq(ratio, 16600); // 166%
         assertTrue(isHealthy);
     }
@@ -526,7 +530,7 @@ contract VaultManagerTest is Test {
     }
 
     function testCheckBorrowCapacity() public {
-        uint256 depositAmount = 1000 * 10**6;
+        uint256 depositAmount = 1000 * 10 ** 6;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -534,15 +538,15 @@ contract VaultManagerTest is Test {
         vm.stopPrank();
 
         (bool canBorrow, uint256 maxBorrowable) = vaultManager
-            .checkBorrowCapacity(user1, 50000 * 10**18);
+            .checkBorrowCapacity(user1, 50000 * 10 ** 18);
 
         assertTrue(canBorrow);
         assertEq(maxBorrowable, 55333333333333333333333); // ~55,333 oINR
     }
 
     function testCheckBorrowCapacityExceeds() public {
-        uint256 depositAmount = 1000 * 10**6;
-        uint256 excessiveAmount = 60000 * 10**18;
+        uint256 depositAmount = 1000 * 10 ** 6;
+        uint256 excessiveAmount = 60000 * 10 ** 18;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -562,7 +566,7 @@ contract VaultManagerTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testOraclePriceUpdate() public {
-        uint256 newPrice = 85 * 10**18; // Update to 85 INR per USDC
+        uint256 newPrice = 85 * 10 ** 18; // Update to 85 INR per USDC
 
         oracle.setPrice(address(mockUSDC), newPrice);
 
@@ -570,7 +574,7 @@ contract VaultManagerTest is Test {
     }
 
     function testBorrowAfterPriceChange() public {
-        uint256 depositAmount = 1000 * 10**6;
+        uint256 depositAmount = 1000 * 10 ** 6;
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
@@ -578,14 +582,14 @@ contract VaultManagerTest is Test {
         vm.stopPrank();
 
         // Increase USDC price
-        oracle.setPrice(address(mockUSDC), 90 * 10**18);
+        oracle.setPrice(address(mockUSDC), 90 * 10 ** 18);
 
         // Should be able to borrow more now
         vm.prank(user1);
-        vaultManager.borrow(60000 * 10**18);
+        vaultManager.borrow(60000 * 10 ** 18);
 
         (, uint256 debt) = vaultEngine.vaults(user1);
-        assertEq(debt, 60000 * 10**18);
+        assertEq(debt, 60000 * 10 ** 18);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -596,29 +600,29 @@ contract VaultManagerTest is Test {
         vm.startPrank(user1);
 
         // First cycle
-        mockUSDC.approve(address(vaultManager), 500 * 10**6);
-        vaultManager.deposit(500 * 10**6);
-        vaultManager.borrow(20000 * 10**18);
+        mockUSDC.approve(address(vaultManager), 500 * 10 ** 6);
+        vaultManager.deposit(500 * 10 ** 6);
+        vaultManager.borrow(20000 * 10 ** 18);
 
         // Second deposit
-        mockUSDC.approve(address(vaultManager), 500 * 10**6);
-        vaultManager.deposit(500 * 10**6);
-        vaultManager.borrow(20000 * 10**18);
+        mockUSDC.approve(address(vaultManager), 500 * 10 ** 6);
+        vaultManager.deposit(500 * 10 ** 6);
+        vaultManager.borrow(20000 * 10 ** 18);
 
         // Partial repay
-        oinrToken.approve(address(vaultManager), 10000 * 10**18);
-        vaultManager.repay(10000 * 10**18);
+        oinrToken.approve(address(vaultManager), 10000 * 10 ** 18);
+        vaultManager.repay(10000 * 10 ** 18);
 
         vm.stopPrank();
 
         (uint256 collateral, uint256 debt) = vaultEngine.vaults(user1);
-        assertEq(collateral, 1000 * 10**6);
-        assertEq(debt, 30000 * 10**18);
+        assertEq(collateral, 1000 * 10 ** 6);
+        assertEq(debt, 30000 * 10 ** 18);
     }
 
     function testVerySmallAmounts() public {
-        uint256 smallDeposit = 1 * 10**6; // 1 USDC
-        uint256 smallBorrow = 50 * 10**18; // 50 oINR
+        uint256 smallDeposit = 1 * 10 ** 6; // 1 USDC
+        uint256 smallBorrow = 50 * 10 ** 18; // 50 oINR
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), smallDeposit);
@@ -636,7 +640,7 @@ contract VaultManagerTest is Test {
 
     function testFuzzDeposit(uint256 amount) public {
         // Bound to reasonable amounts
-        amount = bound(amount, 1 * 10**6, INITIAL_USDC);
+        amount = bound(amount, 1 * 10 ** 6, INITIAL_USDC);
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), amount);
@@ -647,12 +651,16 @@ contract VaultManagerTest is Test {
         assertEq(collateral, amount);
     }
 
-    function testFuzzBorrow(uint256 depositAmount, uint256 borrowAmount) public {
-        depositAmount = bound(depositAmount, 100 * 10**6, INITIAL_USDC);
-        
+    function testFuzzBorrow(
+        uint256 depositAmount,
+        uint256 borrowAmount
+    ) public {
+        depositAmount = bound(depositAmount, 100 * 10 ** 6, INITIAL_USDC);
+
         // Max borrow based on deposit
-        uint256 maxBorrow = (depositAmount * USDC_PRICE * 10000) / (10**6 * MIN_RATIO);
-        borrowAmount = bound(borrowAmount, 1 * 10**18, maxBorrow);
+        uint256 maxBorrow = (depositAmount * USDC_PRICE * 10000) /
+            (10 ** 6 * MIN_RATIO);
+        borrowAmount = bound(borrowAmount, 1 * 10 ** 18, maxBorrow);
 
         vm.startPrank(user1);
         mockUSDC.approve(address(vaultManager), depositAmount);
