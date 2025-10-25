@@ -1,0 +1,50 @@
+{
+  "network": "Flow EVM Testnet",
+  "chainId": 545,
+  "rpcUrl": "https://testnet.evm.nodes.onflow.org",
+  "explorer": "https://evm-testnet.flowscan.io",
+  "contracts": {
+    "VaultManager": {
+      "address": "0x22E1AE8A85e76e94683D668c0107b69eF18a62cA",
+      "description": "Main user interface - deposit, borrow, repay, withdraw",
+      "abi": "VaultManager.json"
+    },
+    "VaultEngine": {
+      "address": "0x544759a30fD8fbf6E26b2184119F49921BF3c265",
+      "description": "Accounting system - tracks collateral and debt",
+      "abi": "VaultEngine.json"
+    },
+    "oINR": {
+      "address": "0x883Fa6BE70D11516dC3d9ED851278829a746840F",
+      "description": "oINR stablecoin token (ERC20)",
+      "abi": "oINR.json",
+      "decimals": 18,
+      "symbol": "oINR",
+      "name": "Oruva INR Stablecoin"
+    },
+    "PriceOracle": {
+      "address": "0xBE8b98f6b8ca2E9B643C1Bdd27f5c2A117b7dB4e",
+      "description": "Price oracle for USDC/INR (1 USDC = 83 INR)",
+      "abi": "SimplePriceOracle.json"
+    },
+    "MockUSDC": {
+      "address": "0x6BF62E80CaF83847eD57233Ee119673F8fF7aB5c",
+      "description": "Mock USDC for testing",
+      "abi": "MockUSDC.json",
+      "decimals": 6,
+      "symbol": "mUSDC",
+      "name": "Mock USDC"
+    },
+    "CollateralJoin": {
+      "address": "0x248Ed726c497238c1bD8977b1E377559daE1c479",
+      "description": "Collateral gateway (not currently used)",
+      "abi": "CollateralJoin.json"
+    }
+  },
+  "parameters": {
+    "minCollateralizationRatio": 15000,
+    "ratioDescription": "150% (15000 basis points)",
+    "usdcPriceInINR": 83,
+    "priceDecimals": 18
+  }
+}
