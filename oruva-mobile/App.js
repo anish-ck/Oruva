@@ -13,13 +13,15 @@ import {
     SafeAreaView,
     StatusBar,
 } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
 import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
 import DiagnosticScreen from './app/DiagnosticScreen';
+import { magic } from './src/services/magic';
 
-export default function App() {
+function AppContent() {
     const [connected, setConnected] = useState(false);
     const [address, setAddress] = useState('');
     const [vaultInfo, setVaultInfo] = useState(null);
@@ -796,3 +798,16 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
 });
+
+// Main App component with Magic Relayer
+export default function App() {
+    return (
+        <SafeAreaProvider>
+            {/* Magic Relayer - REQUIRED for Magic authentication to work */}
+            <magic.Relayer backgroundColor="#f3f4f6" />
+            
+            {/* Main app content */}
+            <AppContent />
+        </SafeAreaProvider>
+    );
+}

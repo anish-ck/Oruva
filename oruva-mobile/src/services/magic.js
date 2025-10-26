@@ -8,8 +8,8 @@
 import { Magic } from '@magic-sdk/react-native-expo';
 import { OAuthExtension } from '@magic-ext/react-native-expo-oauth';
 
-// TODO: Replace with your Magic publishable API key from https://dashboard.magic.link/
-const MAGIC_API_KEY = 'YOUR_MAGIC_PUBLISHABLE_API_KEY';
+// Magic publishable API key from https://dashboard.magic.link/
+const MAGIC_API_KEY = 'pk_live_54060FFBAB0C240F';
 
 // Flow EVM Testnet configuration
 const FLOW_EVM_TESTNET = {
