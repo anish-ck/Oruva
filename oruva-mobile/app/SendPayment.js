@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 
-export default function SendPayment({ wallet, onBack, onPaymentSuccess }) {
+export default function SendPayment({ wallet, onBack, onPaymentSuccess, oINRBalance }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
@@ -85,7 +85,18 @@ export default function SendPayment({ wallet, onBack, onPaymentSuccess }) {
       );
     } catch (error) {
       console.error('Payment error:', error);
-      Alert.alert('Error', error.message || 'Payment failed. Please try again.');
+      
+      let errorMessage = 'Payment failed. Please try again.';
+      
+      if (error.message.includes('Insufficient oINR balance')) {
+        errorMessage = `You don't have enough oINR!\n\nYou need ${paymentData.amount} oINR to complete this payment.\n\nPlease buy or borrow oINR first from the main screen.`;
+      } else if (error.message.includes('Insufficient FLOW')) {
+        errorMessage = 'Insufficient FLOW for gas fees.\n\nGet free testnet FLOW from:\nhttps://faucet.flow.com/';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Payment Failed', errorMessage);
       setScanned(false);
       setPaymentData(null);
     } finally {
@@ -189,6 +200,16 @@ export default function SendPayment({ wallet, onBack, onPaymentSuccess }) {
           <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Scan QR Code</Text>
+      </View>
+
+      <View style={styles.balanceInfo}>
+        <Text style={styles.balanceLabel}>Your oINR Balance:</Text>
+        <Text style={styles.balanceAmount}>{oINRBalance || '0'} oINR</Text>
+        {parseFloat(oINRBalance || '0') === 0 && (
+          <Text style={styles.warningText}>
+            ⚠️ You need oINR to send payments. Buy or borrow oINR first!
+          </Text>
+        )}
       </View>
 
       <View style={styles.cameraContainer}>
@@ -296,6 +317,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  balanceInfo: {
+    backgroundColor: '#e3f2fd',
+    padding: 15,
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderRadius: 8,
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: '#1976d2',
+    marginBottom: 5,
+  },
+  balanceAmount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1565c0',
+  },
+  warningText: {
+    fontSize: 13,
+    color: '#d32f2f',
+    marginTop: 8,
+    fontWeight: '500',
   },
   confirmContainer: {
     flex: 1,

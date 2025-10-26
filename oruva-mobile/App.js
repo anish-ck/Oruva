@@ -203,6 +203,7 @@ export default function App() {
                 wallet={walletService}
                 onBack={() => setCurrentScreen('home')}
                 onPaymentSuccess={handleQRPayment}
+                oINRBalance={balances?.oinr}
             />
         );
     }
@@ -460,6 +461,14 @@ export default function App() {
                     <Text style={styles.qrDescription}>
                         Send and receive oINR instantly using QR codes
                     </Text>
+                    
+                    {balances && parseFloat(balances.oinr) === 0 && (
+                        <View style={[styles.card, { backgroundColor: '#fff3cd', padding: 12, marginBottom: 12 }]}>
+                            <Text style={{ fontSize: 13, color: '#856404' }}>
+                                💡 To send payments, you need oINR. Buy or borrow oINR first using the options above!
+                            </Text>
+                        </View>
+                    )}
                     
                     <View style={styles.qrButtonRow}>
                         <TouchableOpacity
