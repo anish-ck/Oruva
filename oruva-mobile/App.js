@@ -16,9 +16,11 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
+import yieldService from './src/services/yield';
 import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
 import DiagnosticScreen from './app/DiagnosticScreen';
+import EarnTab from './components/EarnTab';
 import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
 
 function AppContent() {
@@ -29,7 +31,7 @@ function AppContent() {
     const [loading, setLoading] = useState(false);
 
     // Screen navigation
-    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic'
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -67,6 +69,7 @@ function AppContent() {
                 setAddress(addr);
                 setConnected(true);
                 vaultService.initialize();
+                await yieldService.initialize(walletService.signer, addr);
             }
         } catch (error) {
             console.error('Error checking Magic login:', error);
@@ -93,6 +96,7 @@ function AppContent() {
             setAddress(addr);
             setConnected(true);
             vaultService.initialize();
+            await yieldService.initialize(walletService.signer, addr);
             Alert.alert('Success', `Magic Link login successful!\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
         } catch (error) {
             console.error('Magic login error:', error);
@@ -116,6 +120,7 @@ function AppContent() {
             setAddress(addr);
             setConnected(true);
             vaultService.initialize();
+            await yieldService.initialize(walletService.signer, addr);
             Alert.alert('Success', 'Wallet connected!');
         } catch (error) {
             Alert.alert('Error', 'Failed to connect wallet: ' + error.message);
@@ -274,6 +279,19 @@ function AppContent() {
     }
 
     // Handle screen navigation
+    if (currentScreen === 'earn' && connected) {
+        return (
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.backButton}>
+                    <TouchableOpacity onPress={() => setCurrentScreen('home')}>
+                        <Text style={styles.backButtonText}>← Back</Text>
+                    </TouchableOpacity>
+                </View>
+                <EarnTab />
+            </SafeAreaView>
+        );
+    }
+
     if (currentScreen === 'diagnostic' && connected) {
         return (
             <DiagnosticScreen onBack={() => setCurrentScreen('home')} />
@@ -648,6 +666,22 @@ function AppContent() {
                             <Text style={styles.qrButtonText}>Send</Text>
                         </TouchableOpacity>
                     </View>
+                </View>
+
+                {/* Earn Tab */}
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>💰 Earn Passive Income</Text>
+                    <Text style={styles.qrDescription}>
+                        Deposit USDC or oINR to earn 5% APY
+                    </Text>
+                    
+                    <TouchableOpacity
+                        style={[styles.button, { backgroundColor: '#FF9800' }]}
+                        onPress={() => setCurrentScreen('earn')}
+                        disabled={loading}
+                    >
+                        <Text style={styles.buttonText}>💎 Open Earn Tab</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={{ height: 40 }} />
