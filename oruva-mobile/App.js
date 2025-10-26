@@ -17,6 +17,7 @@ import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
 import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
+import DiagnosticScreen from './app/DiagnosticScreen';
 
 export default function App() {
     const [connected, setConnected] = useState(false);
@@ -26,7 +27,7 @@ export default function App() {
     const [loading, setLoading] = useState(false);
 
     // Screen navigation
-    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send'
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -202,6 +203,12 @@ export default function App() {
     }
 
     // Handle screen navigation
+    if (currentScreen === 'diagnostic' && connected) {
+        return (
+            <DiagnosticScreen onBack={() => setCurrentScreen('home')} />
+        );
+    }
+
     if (currentScreen === 'receive' && connected) {
         return (
             <ReceivePayment
@@ -312,6 +319,13 @@ export default function App() {
                             </Text>
                         </View>
                         <View style={styles.headerButtons}>
+                            <TouchableOpacity 
+                                style={styles.diagnosticButton} 
+                                onPress={() => setCurrentScreen('diagnostic')}
+                                disabled={loading}
+                            >
+                                <Text style={styles.diagnosticButtonText}>🔧</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity 
                                 style={styles.refreshButton} 
                                 onPress={handleRefresh}
@@ -598,6 +612,15 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     refreshButtonText: {
+        fontSize: 18,
+    },
+    diagnosticButton: {
+        backgroundColor: '#9C27B0',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    diagnosticButtonText: {
         fontSize: 18,
     },
     headerTitle: {
