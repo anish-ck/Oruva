@@ -22,14 +22,14 @@ class WalletService {
     async connectWithMagic(magicProvider, address) {
         try {
             console.log('Connecting with Magic provider...');
-            
+
             // Create ethers provider from Magic
             this.provider = new ethers.providers.Web3Provider(magicProvider);
             this.signer = this.provider.getSigner();
             this.address = address;
             this.isMagicWallet = true;
             this.privateKey = null; // Magic manages keys
-            
+
             console.log('Magic wallet connected:', this.address);
             return this.address;
         } catch (error) {

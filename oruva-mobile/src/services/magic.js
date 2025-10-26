@@ -14,8 +14,8 @@ const MAGIC_API_KEY = process.env.EXPO_PUBLIC_MAGIC_PUBLISHABLE_KEY || 'pk_live_
 
 // Flow EVM Testnet configuration from environment variables
 const FLOW_EVM_TESTNET = {
-  rpcUrl: process.env.EXPO_PUBLIC_FLOW_EVM_RPC_URL || 'https://testnet.evm.nodes.onflow.org',
-  chainId: parseInt(process.env.EXPO_PUBLIC_FLOW_EVM_CHAIN_ID || '545'),
+    rpcUrl: process.env.EXPO_PUBLIC_FLOW_EVM_RPC_URL || 'https://testnet.evm.nodes.onflow.org',
+    chainId: parseInt(process.env.EXPO_PUBLIC_FLOW_EVM_CHAIN_ID || '545'),
 };
 
 /**
@@ -24,8 +24,8 @@ const FLOW_EVM_TESTNET = {
  * - Includes OAuth extension for social login
  */
 export const magic = new Magic(MAGIC_API_KEY, {
-  network: FLOW_EVM_TESTNET,
-  extensions: [new OAuthExtension()],
+    network: FLOW_EVM_TESTNET,
+    extensions: [new OAuthExtension()],
 });
 
 /**
@@ -41,18 +41,18 @@ export const magic = new Magic(MAGIC_API_KEY, {
  * @returns {Promise<string>} DID token on success
  */
 export const loginWithEmail = async (email, showUI = true) => {
-  try {
-    console.log('Logging in with email:', email);
-    const didToken = await magic.auth.loginWithEmailOTP({ 
-      email,
-      showUI 
-    });
-    console.log('Login successful!');
-    return didToken;
-  } catch (error) {
-    console.error('Login failed:', error);
-    throw error;
-  }
+    try {
+        console.log('Logging in with email:', email);
+        const didToken = await magic.auth.loginWithEmailOTP({
+            email,
+            showUI
+        });
+        console.log('Login successful!');
+        return didToken;
+    } catch (error) {
+        console.error('Login failed:', error);
+        throw error;
+    }
 };
 
 /**
@@ -63,17 +63,17 @@ export const loginWithEmail = async (email, showUI = true) => {
  * @returns {Promise<void>}
  */
 export const loginWithGoogle = async (redirectURI = 'oruva://oauth-callback') => {
-  try {
-    console.log('Logging in with Google');
-    await magic.oauth.loginWithPopup({
-      provider: 'google',
-      redirectURI,
-    });
-    console.log('Google login successful!');
-  } catch (error) {
-    console.error('Google login failed:', error);
-    throw error;
-  }
+    try {
+        console.log('Logging in with Google');
+        await magic.oauth.loginWithPopup({
+            provider: 'google',
+            redirectURI,
+        });
+        console.log('Google login successful!');
+    } catch (error) {
+        console.error('Google login failed:', error);
+        throw error;
+    }
 };
 
 /**
@@ -82,14 +82,14 @@ export const loginWithGoogle = async (redirectURI = 'oruva://oauth-callback') =>
  * @returns {Promise<boolean>} True if logged in, false otherwise
  */
 export const isLoggedIn = async () => {
-  try {
-    const loggedIn = await magic.user.isLoggedIn();
-    console.log('User logged in:', loggedIn);
-    return loggedIn;
-  } catch (error) {
-    console.error('Error checking login status:', error);
-    return false;
-  }
+    try {
+        const loggedIn = await magic.user.isLoggedIn();
+        console.log('User logged in:', loggedIn);
+        return loggedIn;
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        return false;
+    }
 };
 
 /**
@@ -99,14 +99,14 @@ export const isLoggedIn = async () => {
  * @returns {Promise<object>} User info object
  */
 export const getUserInfo = async () => {
-  try {
-    const userInfo = await magic.user.getInfo();
-    console.log('User info:', userInfo);
-    return userInfo;
-  } catch (error) {
-    console.error('Error getting user info:', error);
-    throw error;
-  }
+    try {
+        const userInfo = await magic.user.getInfo();
+        console.log('User info:', userInfo);
+        return userInfo;
+    } catch (error) {
+        console.error('Error getting user info:', error);
+        throw error;
+    }
 };
 
 /**
@@ -116,18 +116,18 @@ export const getUserInfo = async () => {
  * @returns {Promise<string>} Ethereum address
  */
 export const getUserAddress = async () => {
-  try {
-    const userInfo = await getUserInfo();
-    // Magic SDK v31+ returns wallets object
-    if (userInfo.wallets && userInfo.wallets.ethereum) {
-      return userInfo.wallets.ethereum.publicAddress;
+    try {
+        const userInfo = await getUserInfo();
+        // Magic SDK v31+ returns wallets object
+        if (userInfo.wallets && userInfo.wallets.ethereum) {
+            return userInfo.wallets.ethereum.publicAddress;
+        }
+        // Fallback for older SDK versions
+        return userInfo.publicAddress;
+    } catch (error) {
+        console.error('Error getting user address:', error);
+        throw error;
     }
-    // Fallback for older SDK versions
-    return userInfo.publicAddress;
-  } catch (error) {
-    console.error('Error getting user address:', error);
-    throw error;
-  }
 };
 
 /**
@@ -138,14 +138,14 @@ export const getUserAddress = async () => {
  * @returns {Promise<string>} DID token
  */
 export const getIdToken = async (lifespan = 900) => {
-  try {
-    const token = await magic.user.getIdToken({ lifespan });
-    console.log('ID token generated');
-    return token;
-  } catch (error) {
-    console.error('Error getting ID token:', error);
-    throw error;
-  }
+    try {
+        const token = await magic.user.getIdToken({ lifespan });
+        console.log('ID token generated');
+        return token;
+    } catch (error) {
+        console.error('Error getting ID token:', error);
+        throw error;
+    }
 };
 
 /**
@@ -155,15 +155,15 @@ export const getIdToken = async (lifespan = 900) => {
  * @returns {Promise<boolean>} True on successful logout
  */
 export const logout = async () => {
-  try {
-    console.log('Logging out user');
-    await magic.user.logout();
-    console.log('Logout successful!');
-    return true;
-  } catch (error) {
-    console.error('Logout failed:', error);
-    throw error;
-  }
+    try {
+        console.log('Logging out user');
+        await magic.user.logout();
+        console.log('Logout successful!');
+        return true;
+    } catch (error) {
+        console.error('Logout failed:', error);
+        throw error;
+    }
 };
 
 /**
@@ -174,17 +174,17 @@ export const logout = async () => {
  * @returns {Promise<void>}
  */
 export const showSettings = async (page = null) => {
-  try {
-    console.log('Showing settings');
-    if (page) {
-      await magic.user.showSettings({ page });
-    } else {
-      await magic.user.showSettings();
+    try {
+        console.log('Showing settings');
+        if (page) {
+            await magic.user.showSettings({ page });
+        } else {
+            await magic.user.showSettings();
+        }
+    } catch (error) {
+        console.error('Error showing settings:', error);
+        throw error;
     }
-  } catch (error) {
-    console.error('Error showing settings:', error);
-    throw error;
-  }
 };
 
 /**
@@ -194,13 +194,13 @@ export const showSettings = async (page = null) => {
  * @returns {Promise<void>}
  */
 export const showAddress = async () => {
-  try {
-    console.log('Showing wallet address');
-    await magic.wallet.showAddress();
-  } catch (error) {
-    console.error('Error showing address:', error);
-    throw error;
-  }
+    try {
+        console.log('Showing wallet address');
+        await magic.wallet.showAddress();
+    } catch (error) {
+        console.error('Error showing address:', error);
+        throw error;
+    }
 };
 
 /**
@@ -210,13 +210,13 @@ export const showAddress = async () => {
  * @returns {Promise<void>}
  */
 export const showBalances = async () => {
-  try {
-    console.log('Showing balances');
-    await magic.wallet.showBalances();
-  } catch (error) {
-    console.error('Error showing balances:', error);
-    throw error;
-  }
+    try {
+        console.log('Showing balances');
+        await magic.wallet.showBalances();
+    } catch (error) {
+        console.error('Error showing balances:', error);
+        throw error;
+    }
 };
 
 /**
@@ -229,20 +229,20 @@ export const showBalances = async () => {
  * const signer = provider.getSigner();
  */
 export const getMagicProvider = () => {
-  return magic.rpcProvider;
+    return magic.rpcProvider;
 };
 
 export default {
-  magic,
-  loginWithEmail,
-  loginWithGoogle,
-  isLoggedIn,
-  getUserInfo,
-  getUserAddress,
-  getIdToken,
-  logout,
-  showSettings,
-  showAddress,
-  showBalances,
-  getMagicProvider,
+    magic,
+    loginWithEmail,
+    loginWithGoogle,
+    isLoggedIn,
+    getUserInfo,
+    getUserAddress,
+    getIdToken,
+    logout,
+    showSettings,
+    showAddress,
+    showBalances,
+    getMagicProvider,
 };
