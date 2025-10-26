@@ -19,7 +19,7 @@ import vaultService from './src/services/vault';
 import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
 import DiagnosticScreen from './app/DiagnosticScreen';
-import { magic } from './src/services/magic';
+import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout } from './src/services/magic';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -39,12 +39,58 @@ function AppContent() {
     const [mintAmount, setMintAmount] = useState('');
     const [privateKey, setPrivateKey] = useState('');
     const [importMode, setImportMode] = useState(false);
+    const [magicMode, setMagicMode] = useState(false);
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         if (connected && address) {
             loadData();
         }
     }, [connected, address]);
+
+    // Check if user is already logged in with Magic on app start
+    useEffect(() => {
+        checkMagicLogin();
+    }, []);
+
+    async function checkMagicLogin() {
+        try {
+            const loggedIn = await isLoggedIn();
+            if (loggedIn) {
+                console.log('User already logged in with Magic');
+                const addr = await getUserAddress();
+                setAddress(addr);
+                setConnected(true);
+                vaultService.initialize();
+            }
+        } catch (error) {
+            console.error('Error checking Magic login:', error);
+        }
+    }
+
+    async function handleMagicLogin() {
+        if (!email) {
+            Alert.alert('Error', 'Please enter your email address');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            console.log('Logging in with Magic Link...');
+            await loginWithEmail(email);
+            const addr = await getUserAddress();
+            console.log('Magic wallet address:', addr);
+            
+            setAddress(addr);
+            setConnected(true);
+            vaultService.initialize();
+            Alert.alert('Success', `Magic Link login successful!\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
+        } catch (error) {
+            console.error('Magic login error:', error);
+            Alert.alert('Error', 'Magic login failed: ' + error.message);
+        }
+        setLoading(false);
+    }
 
     async function handleConnect() {
         setLoading(true);
@@ -69,11 +115,25 @@ function AppContent() {
     }
 
     async function handleDisconnect() {
+        // Check if logged in with Magic and logout
+        try {
+            const magicLoggedIn = await isLoggedIn();
+            if (magicLoggedIn) {
+                await logout();
+                console.log('Logged out from Magic');
+            }
+        } catch (error) {
+            console.error('Error logging out from Magic:', error);
+        }
+        
         await walletService.disconnect();
         setConnected(false);
         setAddress('');
         setVaultInfo(null);
         setBalances(null);
+        setEmail('');
+        setMagicMode(false);
+        setImportMode(false);
     }
 
     async function loadData() {
@@ -241,10 +301,18 @@ function AppContent() {
                     <Text style={styles.subtitle}>Borrow INR Stablecoin</Text>
                     <Text style={styles.network}>Flow EVM Testnet</Text>
 
-                    {!importMode ? (
+                    {!importMode && !magicMode ? (
                         <>
                             <TouchableOpacity
-                                style={styles.connectButton}
+                                style={[styles.connectButton, { backgroundColor: '#8b5cf6' }]}
+                                onPress={() => setMagicMode(true)}
+                                disabled={loading}
+                            >
+                                <Text style={styles.buttonText}>🪄 Login with Magic Link</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.connectButton, { marginTop: 12 }]}
                                 onPress={handleConnect}
                                 disabled={loading}
                             >
@@ -262,7 +330,44 @@ function AppContent() {
                                 <Text style={styles.buttonText}>Import MetaMask Wallet</Text>
                             </TouchableOpacity>
 
-                            <Text style={styles.hint}>Choose to create new or import existing</Text>
+                            <Text style={styles.hint}>Login with email or create/import wallet</Text>
+                        </>
+                    ) : magicMode ? (
+                        <>
+                            <TextInput
+                                style={styles.emailInput}
+                                placeholder="Enter your email"
+                                placeholderTextColor="#9ca3af"
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                            />
+
+                            <TouchableOpacity
+                                style={[styles.connectButton, { backgroundColor: '#8b5cf6' }]}
+                                onPress={handleMagicLogin}
+                                disabled={loading || !email}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={styles.buttonText}>Send Magic Link</Text>
+                                )}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.connectButton, { backgroundColor: '#6b7280', marginTop: 12 }]}
+                                onPress={() => {
+                                    setMagicMode(false);
+                                    setEmail('');
+                                }}
+                            >
+                                <Text style={styles.buttonText}>Back</Text>
+                            </TouchableOpacity>
+
+                            <Text style={styles.hint}>✨ No password needed - check your email for login link</Text>
                         </>
                     ) : (
                         <>
@@ -721,6 +826,17 @@ const styles = StyleSheet.create({
         color: '#1f2937',
         width: '90%',
         fontFamily: 'monospace',
+    },
+    emailInput: {
+        borderWidth: 2,
+        borderColor: '#8b5cf6',
+        borderRadius: 12,
+        padding: 16,
+        fontSize: 16,
+        marginBottom: 16,
+        backgroundColor: '#f9fafb',
+        color: '#1f2937',
+        width: '90%',
     },
     connectButton: {
         backgroundColor: '#6366f1',
