@@ -129,17 +129,48 @@ class VaultService {
                 6
             );
 
+            console.log(`💰 Buying ${amountOINR} oINR - needs ${ethers.utils.formatUnits(requiredUSDC, 6)} USDC`);
+
+            // Check current allowance before approving
+            const currentAllowance = await this.usdc.allowance(
+                walletService.getAddress(),
+                CONTRACTS.vaultManager
+            );
+            console.log(`📊 Current allowance: ${ethers.utils.formatUnits(currentAllowance, 6)} USDC`);
+
             // Approve USDC
-            console.log('Approving USDC for purchase...');
+            console.log(`✍️ Approving ${ethers.utils.formatUnits(requiredUSDC, 6)} USDC...`);
             const approveTx = await this.usdc.approve(CONTRACTS.vaultManager, requiredUSDC);
-            await approveTx.wait();
+            console.log(`⏳ Waiting for approval tx: ${approveTx.hash}`);
+            const approveReceipt = await approveTx.wait();
+            console.log(`✅ Approval confirmed! Status: ${approveReceipt.status}, Gas used: ${approveReceipt.gasUsed.toString()}`);
+
+            // Verify allowance was set
+            const newAllowance = await this.usdc.allowance(
+                walletService.getAddress(),
+                CONTRACTS.vaultManager
+            );
+            console.log(`📊 New allowance: ${ethers.utils.formatUnits(newAllowance, 6)} USDC`);
+            
+            if (newAllowance.lt(requiredUSDC)) {
+                throw new Error(`Approval failed! Allowance is ${ethers.utils.formatUnits(newAllowance, 6)} but need ${ethers.utils.formatUnits(requiredUSDC, 6)}`);
+            }
 
             // Buy oINR
-            console.log('Buying oINR...');
+            console.log('🛒 Calling buyOINR...');
             const tx = await this.vaultManager.buyOINR(amount);
-            return await tx.wait();
+            console.log(`⏳ Waiting for buyOINR tx: ${tx.hash}`);
+            const receipt = await tx.wait();
+            console.log(`✅ Purchase complete! Status: ${receipt.status}`);
+            return receipt;
         } catch (error) {
-            console.error('Buy oINR error:', error);
+            console.error('❌ Buy oINR error:', error);
+            if (error.data) {
+                console.error('Error data:', error.data);
+            }
+            if (error.error) {
+                console.error('Inner error:', error.error);
+            }
             throw error;
         }
     }
