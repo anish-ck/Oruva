@@ -18,6 +18,7 @@ import yieldService from '../services/yield';
 import walletService from '../services/wallet';
 import usdcService from '../services/usdc';
 import oinrService from '../services/oinr';
+import { CONTRACTS } from '../services/../config/contracts';
 
 export default function EarnTab() {
   const [loading, setLoading] = useState(true);
@@ -61,8 +62,8 @@ export default function EarnTab() {
 
     const tokenService = selectedVault === 'USDC' ? usdcService : oinrService;
     const vaultAddress = selectedVault === 'USDC' 
-      ? '0x0009f72e3c176163037807f6365695DCeED2a09B'
-      : '0x5923227b1E40fEbDA88B5231a573069F9669Fb9a';
+      ? CONTRACTS.usdcYieldVault
+      : CONTRACTS.oinrYieldVault;
 
     try {
       setProcessing(true);

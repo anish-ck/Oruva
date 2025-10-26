@@ -4,7 +4,7 @@
  */
 
 import { ethers } from 'ethers';
-import contractAddresses from '../../../CONTRACT_ADDRESSES.json';
+import { CONTRACTS } from '../config/contracts';
 
 // YieldVault ABI (simplified)
 const YIELD_VAULT_ABI = [
@@ -36,20 +36,20 @@ class YieldService {
 
     // Initialize vault contracts
     this.usdcVault = new ethers.Contract(
-      contractAddresses.contracts.USDCYieldVault.address,
+      CONTRACTS.usdcYieldVault,
       YIELD_VAULT_ABI,
       signer
     );
 
     this.oinrVault = new ethers.Contract(
-      contractAddresses.contracts.oINRYieldVault.address,
+      CONTRACTS.oinrYieldVault,
       YIELD_VAULT_ABI,
       signer
     );
 
     console.log('YieldService initialized');
-    console.log('USDC Vault:', contractAddresses.contracts.USDCYieldVault.address);
-    console.log('oINR Vault:', contractAddresses.contracts.oINRYieldVault.address);
+    console.log('USDC Vault:', CONTRACTS.usdcYieldVault);
+    console.log('oINR Vault:', CONTRACTS.oinrYieldVault);
   }
 
   /**

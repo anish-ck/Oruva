@@ -674,7 +674,7 @@ function AppContent() {
                     <Text style={styles.qrDescription}>
                         Deposit USDC or oINR to earn 5% APY
                     </Text>
-                    
+
                     <TouchableOpacity
                         style={[styles.button, { backgroundColor: '#FF9800' }]}
                         onPress={() => setCurrentScreen('earn')}
