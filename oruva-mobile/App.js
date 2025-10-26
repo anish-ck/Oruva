@@ -19,7 +19,7 @@ import vaultService from './src/services/vault';
 import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
 import DiagnosticScreen from './app/DiagnosticScreen';
-import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout } from './src/services/magic';
+import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -59,6 +59,11 @@ function AppContent() {
             if (loggedIn) {
                 console.log('User already logged in with Magic');
                 const addr = await getUserAddress();
+                
+                // Connect wallet service with Magic provider
+                const magicProvider = getMagicProvider();
+                await walletService.connectWithMagic(magicProvider, addr);
+                
                 setAddress(addr);
                 setConnected(true);
                 vaultService.initialize();
@@ -80,6 +85,10 @@ function AppContent() {
             await loginWithEmail(email);
             const addr = await getUserAddress();
             console.log('Magic wallet address:', addr);
+            
+            // Connect wallet service with Magic provider
+            const magicProvider = getMagicProvider();
+            await walletService.connectWithMagic(magicProvider, addr);
             
             setAddress(addr);
             setConnected(true);

@@ -11,6 +11,31 @@ class WalletService {
         this.signer = null;
         this.address = null;
         this.privateKey = null;
+        this.isMagicWallet = false; // Track if using Magic
+    }
+
+    /**
+     * Connect with Magic Link provider
+     * @param {object} magicProvider - Magic RPC provider
+     * @param {string} address - User's Magic wallet address
+     */
+    async connectWithMagic(magicProvider, address) {
+        try {
+            console.log('Connecting with Magic provider...');
+            
+            // Create ethers provider from Magic
+            this.provider = new ethers.providers.Web3Provider(magicProvider);
+            this.signer = this.provider.getSigner();
+            this.address = address;
+            this.isMagicWallet = true;
+            this.privateKey = null; // Magic manages keys
+            
+            console.log('Magic wallet connected:', this.address);
+            return this.address;
+        } catch (error) {
+            console.error('Magic wallet connection failed:', error);
+            throw error;
+        }
     }
 
     async connect() {
@@ -81,13 +106,16 @@ class WalletService {
 
     async disconnect() {
         try {
-            // Clear saved key
-            await AsyncStorage.removeItem('wallet_private_key');
+            // Only clear AsyncStorage for non-Magic wallets
+            if (!this.isMagicWallet) {
+                await AsyncStorage.removeItem('wallet_private_key');
+            }
 
             this.provider = null;
             this.signer = null;
             this.address = null;
             this.privateKey = null;
+            this.isMagicWallet = false;
         } catch (error) {
             console.error('Disconnect error:', error);
         }
