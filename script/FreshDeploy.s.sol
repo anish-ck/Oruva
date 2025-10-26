@@ -53,7 +53,7 @@ contract FreshDeploy is Script {
 
         // 5. Setup permissions
         console.log("\n5. Setting up permissions...");
-        
+
         // Transfer oINR ownership to VaultManager
         oinrToken.transferOwnership(address(vaultManager));
         console.log("   [OK] oINR owned by VaultManager");
@@ -73,7 +73,11 @@ contract FreshDeploy is Script {
 
         // Verify buyOINR function exists
         console.log("\nVerifying VaultManager...");
-        console.log("Min Ratio:", vaultManager.minCollateralizationRatio(), "bp");
+        console.log(
+            "Min Ratio:",
+            vaultManager.minCollateralizationRatio(),
+            "bp"
+        );
 
         console.log("\n[SUCCESS] All contracts deployed and configured!");
         console.log("\nNEXT STEPS:");

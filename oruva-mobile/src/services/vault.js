@@ -151,7 +151,7 @@ class VaultService {
                 CONTRACTS.vaultManager
             );
             console.log(`📊 New allowance: ${ethers.utils.formatUnits(newAllowance, 6)} USDC`);
-            
+
             if (newAllowance.lt(requiredUSDC)) {
                 throw new Error(`Approval failed! Allowance is ${ethers.utils.formatUnits(newAllowance, 6)} but need ${ethers.utils.formatUnits(requiredUSDC, 6)}`);
             }

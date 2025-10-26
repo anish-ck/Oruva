@@ -319,15 +319,15 @@ export default function App() {
                             </Text>
                         </View>
                         <View style={styles.headerButtons}>
-                            <TouchableOpacity 
-                                style={styles.diagnosticButton} 
+                            <TouchableOpacity
+                                style={styles.diagnosticButton}
                                 onPress={() => setCurrentScreen('diagnostic')}
                                 disabled={loading}
                             >
                                 <Text style={styles.diagnosticButtonText}>🔧</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={styles.refreshButton} 
+                            <TouchableOpacity
+                                style={styles.refreshButton}
                                 onPress={handleRefresh}
                                 disabled={loading}
                             >
