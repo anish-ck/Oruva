@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,26 +14,32 @@
             padding: 20px;
             background: #f5f5f5;
         }
+
         .container {
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             color: #4CAF50;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
         }
-        input, textarea {
+
+        input,
+        textarea {
             width: 100%;
             padding: 12px;
             border: 1px #ddd solid;
@@ -40,6 +47,7 @@
             font-size: 16px;
             box-sizing: border-box;
         }
+
         button {
             width: 100%;
             padding: 15px;
@@ -51,9 +59,11 @@
             font-weight: 600;
             cursor: pointer;
         }
+
         button:hover {
             background: #45a049;
         }
+
         #qrcode {
             text-align: center;
             margin-top: 30px;
@@ -61,6 +71,7 @@
             background: #f9f9f9;
             border-radius: 8px;
         }
+
         .info {
             background: #e3f2fd;
             padding: 15px;
@@ -68,6 +79,7 @@
             margin-bottom: 20px;
             color: #1976d2;
         }
+
         .code-display {
             background: #f5f5f5;
             padding: 15px;
@@ -79,10 +91,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🔥 Oruva QR Payment Generator</h1>
-        
+
         <div class="info">
             <strong>ℹ️ Test Instructions:</strong><br>
             1. Enter payment details below<br>
@@ -139,7 +152,7 @@
 
             // Clear previous QR
             document.getElementById('qrcode').innerHTML = '<h3>Scan this QR Code:</h3>';
-            
+
             // Generate new QR
             new QRCode(document.getElementById('qrcode'), {
                 text: qrData,
@@ -156,9 +169,10 @@
         }
 
         // Auto-fill with a test address hint
-        window.onload = function() {
+        window.onload = function () {
             document.getElementById('receiver').placeholder = 'Paste your wallet address from the app';
         }
     </script>
 </body>
+
 </html>

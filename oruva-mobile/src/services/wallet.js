@@ -159,7 +159,7 @@ class WalletService {
             return receipt;
         } catch (error) {
             console.error('Transfer error:', error);
-            
+
             // Parse error messages
             if (error.message.includes('insufficient funds')) {
                 throw new Error('Insufficient FLOW for gas fees');
@@ -168,7 +168,7 @@ class WalletService {
             } else if (error.code === 'CALL_EXCEPTION') {
                 throw new Error('Transfer failed - check contract permissions');
             }
-            
+
             throw new Error(error.message || 'Transfer failed');
         }
     }

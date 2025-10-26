@@ -75,13 +75,27 @@ export default function App() {
 
     async function loadData() {
         try {
+            console.log('Loading data for address:', address);
             const info = await vaultService.getVaultInfo(address);
             const bal = await vaultService.getBalances(address);
+            console.log('Vault info:', info);
+            console.log('Balances:', bal);
             setVaultInfo(info);
             setBalances(bal);
         } catch (error) {
             console.error('Failed to load data:', error);
         }
+    }
+
+    async function handleRefresh() {
+        setLoading(true);
+        try {
+            await loadData();
+            Alert.alert('Success', 'Balances refreshed!');
+        } catch (error) {
+            Alert.alert('Error', 'Failed to refresh: ' + error.message);
+        }
+        setLoading(false);
     }
 
     async function handleMintUSDC() {
@@ -129,9 +143,9 @@ export default function App() {
         setLoading(true);
         try {
             await vaultService.borrow(parseFloat(borrowAmount));
-            Alert.alert('Success', 'Borrow successful!');
-            setBorrowAmount('');
             await loadData();
+            Alert.alert('Success', `Borrowed ${borrowAmount} oINR!\n\nCheck your oINR balance above.`);
+            setBorrowAmount('');
         } catch (error) {
             Alert.alert('Error', error.message);
         }
@@ -147,9 +161,9 @@ export default function App() {
         setLoading(true);
         try {
             await vaultService.buyOINR(parseFloat(buyAmount));
-            Alert.alert('Success', `Bought ${buyAmount} oINR!`);
-            setBuyAmount('');
             await loadData();
+            Alert.alert('Success', `Bought ${buyAmount} oINR!\n\nCheck your oINR balance above.`);
+            setBuyAmount('');
         } catch (error) {
             Alert.alert('Error', error.message);
         }
@@ -290,13 +304,28 @@ export default function App() {
             <ScrollView style={styles.scrollView}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Your Vault</Text>
-                    <Text style={styles.address}>
-                        {address.slice(0, 6)}...{address.slice(-4)}
-                    </Text>
-                    <TouchableOpacity onPress={handleDisconnect}>
-                        <Text style={styles.disconnect}>Disconnect</Text>
-                    </TouchableOpacity>
+                    <View style={styles.headerRow}>
+                        <View>
+                            <Text style={styles.headerTitle}>Your Vault</Text>
+                            <Text style={styles.address}>
+                                {address.slice(0, 6)}...{address.slice(-4)}
+                            </Text>
+                        </View>
+                        <View style={styles.headerButtons}>
+                            <TouchableOpacity 
+                                style={styles.refreshButton} 
+                                onPress={handleRefresh}
+                                disabled={loading}
+                            >
+                                <Text style={styles.refreshButtonText}>
+                                    {loading ? '⏳' : '🔄'}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDisconnect}>
+                                <Text style={styles.disconnect}>Disconnect</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Gas Fee Info */}
@@ -461,7 +490,7 @@ export default function App() {
                     <Text style={styles.qrDescription}>
                         Send and receive oINR instantly using QR codes
                     </Text>
-                    
+
                     {balances && parseFloat(balances.oinr) === 0 && (
                         <View style={[styles.card, { backgroundColor: '#fff3cd', padding: 12, marginBottom: 12 }]}>
                             <Text style={{ fontSize: 13, color: '#856404' }}>
@@ -469,7 +498,7 @@ export default function App() {
                             </Text>
                         </View>
                     )}
-                    
+
                     <View style={styles.qrButtonRow}>
                         <TouchableOpacity
                             style={[styles.qrButton, { backgroundColor: '#4CAF50' }]}
@@ -551,6 +580,25 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 20,
         paddingVertical: 10,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    headerButtons: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    refreshButton: {
+        backgroundColor: '#10b981',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    refreshButtonText: {
+        fontSize: 18,
     },
     headerTitle: {
         fontSize: 28,
