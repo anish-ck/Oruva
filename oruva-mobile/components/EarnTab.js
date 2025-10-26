@@ -12,13 +12,14 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
-import yieldService from '../services/yield';
-import walletService from '../services/wallet';
-import usdcService from '../services/usdc';
-import oinrService from '../services/oinr';
-import { CONTRACTS } from '../services/../config/contracts';
+import yieldService from '../src/services/yield';
+import vaultService from '../src/services/vault';
+import walletService from '../src/services/wallet';
+import { CONTRACTS } from '../src/config/contracts';
+import { ethers } from 'ethers';
 
 export default function EarnTab() {
   const [loading, setLoading] = useState(true);
@@ -41,10 +42,9 @@ export default function EarnTab() {
       const info = await yieldService.getAllVaultInfo();
       setVaultInfo(info);
       
-      // Get token balances
-      const usdcBalance = await usdcService.getBalance();
-      const oinrBalance = await oinrService.getBalance();
-      setBalances({ usdc: usdcBalance, oinr: oinrBalance });
+      // Get token balances from vaultService
+      const balanceInfo = await vaultService.getBalances(walletService.address);
+      setBalances(balanceInfo);
       
       setLoading(false);
     } catch (error) {
@@ -60,7 +60,6 @@ export default function EarnTab() {
       return;
     }
 
-    const tokenService = selectedVault === 'USDC' ? usdcService : oinrService;
     const vaultAddress = selectedVault === 'USDC' 
       ? CONTRACTS.usdcYieldVault
       : CONTRACTS.oinrYieldVault;
@@ -68,9 +67,15 @@ export default function EarnTab() {
     try {
       setProcessing(true);
 
+      // Get token contract and parse amount with correct decimals
+      const tokenContract = selectedVault === 'USDC' ? vaultService.usdc : vaultService.oinr;
+      const decimals = selectedVault === 'USDC' ? 6 : 18;
+      const amount = ethers.utils.parseUnits(depositAmount.toString(), decimals);
+
       // Approve vault to spend tokens
       console.log(`Approving ${selectedVault} vault...`);
-      await tokenService.approve(vaultAddress, depositAmount);
+      const approveTx = await tokenContract.approve(vaultAddress, amount);
+      await approveTx.wait();
 
       // Deposit to vault
       console.log(`Depositing ${depositAmount} ${selectedVault}...`);
@@ -199,9 +204,11 @@ export default function EarnTab() {
           </Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Total Claimed</Text>
+          <Text style={styles.statLabel}>Deposit Time</Text>
           <Text style={styles.statValue}>
-            {parseFloat(currentVault?.totalClaimed || 0).toFixed(2)}
+            {currentVault?.depositTime && currentVault.depositTime !== '0' 
+              ? new Date(parseInt(currentVault.depositTime) * 1000).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </View>
       </View>

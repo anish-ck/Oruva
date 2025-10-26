@@ -12,8 +12,8 @@ const YIELD_VAULT_ABI = [
   'function withdraw(uint256 amount) external',
   'function claimYield() external',
   'function calculateYield(address user) external view returns (uint256)',
-  'function getUserInfo(address user) external view returns (uint256 depositAmount, uint256 depositTime, uint256 totalClaimed)',
-  'function apy() external view returns (uint256)',
+  'function getUserInfo(address user) external view returns (uint256 depositedAmount, uint256 pendingYield, uint256 depositTime, uint256 lastClaimTime)',
+  'function apyBasisPoints() external view returns (uint256)',
   'event Deposited(address indexed user, uint256 amount)',
   'event Withdrawn(address indexed user, uint256 amount)',
   'event YieldClaimed(address indexed user, uint256 amount)'
@@ -59,19 +59,15 @@ class YieldService {
     const vault = vaultType === 'USDC' ? this.usdcVault : this.oinrVault;
     
     try {
-      const [depositAmount, depositTime, totalClaimed] = await vault.getUserInfo(this.userAddress);
-      const pendingYield = await vault.calculateYield(this.userAddress);
+      const [depositedAmount, pendingYield, depositTime, lastClaimTime] = await vault.getUserInfo(this.userAddress);
       
       return {
         depositAmount: ethers.utils.formatUnits(
-          depositAmount,
+          depositedAmount,
           vaultType === 'USDC' ? 6 : 18
         ),
         depositTime: depositTime.toString(),
-        totalClaimed: ethers.utils.formatUnits(
-          totalClaimed,
-          vaultType === 'USDC' ? 6 : 18
-        ),
+        lastClaimTime: lastClaimTime.toString(),
         pendingYield: ethers.utils.formatUnits(
           pendingYield,
           vaultType === 'USDC' ? 6 : 18
@@ -82,7 +78,7 @@ class YieldService {
       return {
         depositAmount: '0',
         depositTime: '0',
-        totalClaimed: '0',
+        lastClaimTime: '0',
         pendingYield: '0'
       };
     }
@@ -159,7 +155,7 @@ class YieldService {
     const vault = vaultType === 'USDC' ? this.usdcVault : this.oinrVault;
     
     try {
-      const apyBps = await vault.apy();
+      const apyBps = await vault.apyBasisPoints();
       return apyBps.toNumber() / 100; // Convert basis points to percentage
     } catch (error) {
       console.error(`Error getting ${vaultType} APY:`, error);
