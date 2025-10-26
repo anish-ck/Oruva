@@ -13,3 +13,21 @@ docs/
 # Dotenv file
 .env
 node_modules/
+
+# Debug/test scripts (keep for reference but not essential)
+check_*.js
+temp_check.js
+quick_check.js
+deep_check.js
+analyze_tx.js
+decode_error.js
+test_buy_function.js
+verify_new_deployment.js
+fresh_deploy.log
+check_now.sh
+
+# Package lock files (regenerated on install)
+package-lock.json
+
+# Git cleanup
+.git/gc.log
