@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
+import ReceivePayment from './app/ReceivePayment';
+import SendPayment from './app/SendPayment';
 
 export default function App() {
     const [connected, setConnected] = useState(false);
@@ -22,6 +24,9 @@ export default function App() {
     const [vaultInfo, setVaultInfo] = useState(null);
     const [balances, setBalances] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Screen navigation
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -167,6 +172,39 @@ export default function App() {
             Alert.alert('Error', error.message);
         }
         setLoading(false);
+    }
+
+    async function handleQRPayment(toAddress, amount) {
+        setLoading(true);
+        try {
+            const oINRContract = vaultService.getOINRContract();
+            await walletService.transferOINR(toAddress, amount, oINRContract);
+            await loadData();
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Handle screen navigation
+    if (currentScreen === 'receive' && connected) {
+        return (
+            <ReceivePayment
+                walletAddress={address}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'send' && connected) {
+        return (
+            <SendPayment
+                wallet={walletService}
+                onBack={() => setCurrentScreen('home')}
+                onPaymentSuccess={handleQRPayment}
+            />
+        );
     }
 
     if (!connected) {
@@ -416,6 +454,34 @@ export default function App() {
                     </TouchableOpacity>
                 </View>
 
+                {/* QR Payments */}
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>📱 UPI-Style QR Payments</Text>
+                    <Text style={styles.qrDescription}>
+                        Send and receive oINR instantly using QR codes
+                    </Text>
+                    
+                    <View style={styles.qrButtonRow}>
+                        <TouchableOpacity
+                            style={[styles.qrButton, { backgroundColor: '#4CAF50' }]}
+                            onPress={() => setCurrentScreen('receive')}
+                            disabled={loading}
+                        >
+                            <Text style={styles.qrButtonIcon}>📥</Text>
+                            <Text style={styles.qrButtonText}>Receive</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.qrButton, { backgroundColor: '#2196F3' }]}
+                            onPress={() => setCurrentScreen('send')}
+                            disabled={loading}
+                        >
+                            <Text style={styles.qrButtonIcon}>📤</Text>
+                            <Text style={styles.qrButtonText}>Send</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
                 <View style={{ height: 40 }} />
             </ScrollView>
 
@@ -617,5 +683,36 @@ const styles = StyleSheet.create({
         marginTop: 16,
         fontSize: 16,
         fontWeight: '600',
+    },
+    qrDescription: {
+        fontSize: 14,
+        color: '#6b7280',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    qrButtonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    qrButton: {
+        flex: 1,
+        padding: 20,
+        borderRadius: 12,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    qrButtonIcon: {
+        fontSize: 32,
+        marginBottom: 8,
+    },
+    qrButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '700',
     },
 });

@@ -209,6 +209,15 @@ class VaultService {
             throw error;
         }
     }
+
+    /**
+     * Get the oINR contract instance for direct interactions
+     * Used for peer-to-peer transfers via QR payments
+     */
+    getOINRContract() {
+        if (!this.oinr) this.initialize();
+        return this.oinr;
+    }
 }
 
 export default new VaultService();

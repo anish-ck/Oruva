@@ -119,6 +119,59 @@ class WalletService {
             return '0';
         }
     }
+
+    /**
+     * Transfer oINR tokens to another address
+     * @param {string} toAddress - Recipient address
+     * @param {string} amount - Amount of oINR to transfer
+     * @param {object} oINRContract - oINR contract instance
+     * @returns {object} Transaction receipt
+     */
+    async transferOINR(toAddress, amount, oINRContract) {
+        if (!this.signer) {
+            throw new Error('Wallet not connected');
+        }
+
+        if (!ethers.utils.isAddress(toAddress)) {
+            throw new Error('Invalid recipient address');
+        }
+
+        try {
+            // Convert amount to wei (18 decimals)
+            const amountInWei = ethers.utils.parseEther(amount.toString());
+
+            // Check balance first
+            const balance = await oINRContract.balanceOf(this.address);
+            if (balance.lt(amountInWei)) {
+                throw new Error('Insufficient oINR balance');
+            }
+
+            console.log(`Transferring ${amount} oINR to ${toAddress}...`);
+
+            // Execute transfer
+            const tx = await oINRContract.transfer(toAddress, amountInWei);
+            console.log('Transaction sent:', tx.hash);
+
+            // Wait for confirmation
+            const receipt = await tx.wait();
+            console.log('Transaction confirmed:', receipt.transactionHash);
+
+            return receipt;
+        } catch (error) {
+            console.error('Transfer error:', error);
+            
+            // Parse error messages
+            if (error.message.includes('insufficient funds')) {
+                throw new Error('Insufficient FLOW for gas fees');
+            } else if (error.message.includes('Insufficient oINR balance')) {
+                throw error;
+            } else if (error.code === 'CALL_EXCEPTION') {
+                throw new Error('Transfer failed - check contract permissions');
+            }
+            
+            throw new Error(error.message || 'Transfer failed');
+        }
+    }
 }
 
 export default new WalletService();
