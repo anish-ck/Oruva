@@ -54,14 +54,14 @@ export default function DiagnosticScreen({ onBack }) {
       const provider = new ethers.providers.JsonRpcProvider(FLOW_EVM_TESTNET.rpcUrl);
       const vaultEngineABI = [
         "function vaults(address) view returns (uint256 collateral, uint256 debt)",
-        "function manager() view returns (address)"
+        "function vaultManager() view returns (address)"
       ];
       const vaultEngine = new ethers.Contract(CONTRACTS.vaultEngine, vaultEngineABI, provider);
       
       const address = walletService.getAddress();
       
       const vault = await vaultEngine.vaults(address);
-      const manager = await vaultEngine.manager();
+      const manager = await vaultEngine.vaultManager();
       
       let output = `🔍 VaultEngine Diagnostic\n\n`;
       output += `Your Vault:\n`;
@@ -92,11 +92,11 @@ export default function DiagnosticScreen({ onBack }) {
       // Check VaultEngine
       const vaultEngineABI = [
         "function vaults(address) view returns (uint256 collateral, uint256 debt)",
-        "function manager() view returns (address)"
+        "function vaultManager() view returns (address)"
       ];
       const vaultEngine = new ethers.Contract(CONTRACTS.vaultEngine, vaultEngineABI, provider);
       const vault = await vaultEngine.vaults(address);
-      const veManager = await vaultEngine.manager();
+      const veManager = await vaultEngine.vaultManager();
       
       let output = `🔍 COMPLETE DIAGNOSTIC\n\n`;
       output += `=== YOUR WALLET ===\n`;
