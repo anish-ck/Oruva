@@ -5,17 +5,17 @@
     "explorer": "https://evm-testnet.flowscan.io",
     "contracts": {
         "VaultManager": {
-            "address": "0x347fe2d1A1789AeDd2cB7eFFC86377b8D208A295",
+            "address": "0x5F1311808ED97661D5b31F4C67637D8952a54cc0",
             "description": "Main user interface - deposit, borrow, repay, withdraw",
             "abi": "VaultManager.json"
         },
         "VaultEngine": {
-            "address": "0x9Bc8A5BF079dd86F7873C44c4D1FF9CC88dDE35e",
+            "address": "0xa9255087b8d1B75456eA5d4fc272B884E7A7AE8a",
             "description": "Accounting system - tracks collateral and debt",
             "abi": "VaultEngine.json"
         },
         "oINR": {
-            "address": "0x5E6883b7b37A02381325234ECbf13f0729584aD0",
+            "address": "0x13d855720E87eC59BFC4E27851027f5D8D8E9Eae",
             "description": "oINR stablecoin token (ERC20)",
             "abi": "oINR.json",
             "decimals": 18,
@@ -36,7 +36,7 @@
             "name": "Mock USDC"
         },
         "CollateralJoin": {
-            "address": "0xf7d4e2ab21e0a74f342688209F271a188B807Dc6",
+            "address": "0x0b54a6bf84108d7C8d5a2296Df4a2264b1f7Fd66",
             "description": "Collateral gateway (not currently used)",
             "abi": "CollateralJoin.json"
         }

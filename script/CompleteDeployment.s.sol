@@ -77,12 +77,18 @@ contract CompleteDeployment is Script {
         console.log("\n=== Verifying Setup ===");
         address engineManager = vaultEngine.vaultManager();
         address oinrOwner = oinrToken.owner();
-        
+
         console.log("VaultEngine manager:", engineManager);
         console.log("oINR owner:", oinrOwner);
-        
-        require(engineManager == address(vaultManager), "VaultManager not set in engine");
-        require(oinrOwner == address(vaultManager), "VaultManager not owner of oINR");
+
+        require(
+            engineManager == address(vaultManager),
+            "VaultManager not set in engine"
+        );
+        require(
+            oinrOwner == address(vaultManager),
+            "VaultManager not owner of oINR"
+        );
 
         console.log("\n=== Deployment Summary ===");
         console.log("MockUSDC:          ", address(usdc));

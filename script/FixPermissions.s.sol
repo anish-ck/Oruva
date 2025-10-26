@@ -38,10 +38,13 @@ contract FixPermissions is Script {
             console.log("  Setting new manager...");
             IVaultEngine(VAULT_ENGINE).setVaultManager(VAULT_MANAGER);
             console.log("  [OK] VaultManager set successfully");
-            
+
             currentManager = IVaultEngine(VAULT_ENGINE).vaultManager();
             console.log("  Verified new manager:", currentManager);
-            require(currentManager == VAULT_MANAGER, "Manager not set correctly");
+            require(
+                currentManager == VAULT_MANAGER,
+                "Manager not set correctly"
+            );
         } else {
             console.log("  [OK] Already set correctly");
         }
@@ -58,7 +61,7 @@ contract FixPermissions is Script {
             console.log("  Transferring ownership...");
             IoINR(OINR_TOKEN).transferOwnership(VAULT_MANAGER);
             console.log("  [OK] Ownership transferred");
-            
+
             currentOwner = IoINR(OINR_TOKEN).owner();
             console.log("  Verified new owner:", currentOwner);
             require(currentOwner == VAULT_MANAGER, "Ownership not transferred");

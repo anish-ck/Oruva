@@ -15,6 +15,9 @@ import {
 } from 'react-native';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
+import ReceivePayment from './app/ReceivePayment';
+import SendPayment from './app/SendPayment';
+import DiagnosticScreen from './app/DiagnosticScreen';
 
 export default function App() {
     const [connected, setConnected] = useState(false);
@@ -22,6 +25,9 @@ export default function App() {
     const [vaultInfo, setVaultInfo] = useState(null);
     const [balances, setBalances] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Screen navigation
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -70,13 +76,27 @@ export default function App() {
 
     async function loadData() {
         try {
+            console.log('Loading data for address:', address);
             const info = await vaultService.getVaultInfo(address);
             const bal = await vaultService.getBalances(address);
+            console.log('Vault info:', info);
+            console.log('Balances:', bal);
             setVaultInfo(info);
             setBalances(bal);
         } catch (error) {
             console.error('Failed to load data:', error);
         }
+    }
+
+    async function handleRefresh() {
+        setLoading(true);
+        try {
+            await loadData();
+            Alert.alert('Success', 'Balances refreshed!');
+        } catch (error) {
+            Alert.alert('Error', 'Failed to refresh: ' + error.message);
+        }
+        setLoading(false);
     }
 
     async function handleMintUSDC() {
@@ -124,9 +144,9 @@ export default function App() {
         setLoading(true);
         try {
             await vaultService.borrow(parseFloat(borrowAmount));
-            Alert.alert('Success', 'Borrow successful!');
-            setBorrowAmount('');
             await loadData();
+            Alert.alert('Success', `Borrowed ${borrowAmount} oINR!\n\nCheck your oINR balance above.`);
+            setBorrowAmount('');
         } catch (error) {
             Alert.alert('Error', error.message);
         }
@@ -142,9 +162,9 @@ export default function App() {
         setLoading(true);
         try {
             await vaultService.buyOINR(parseFloat(buyAmount));
-            Alert.alert('Success', `Bought ${buyAmount} oINR!`);
-            setBuyAmount('');
             await loadData();
+            Alert.alert('Success', `Bought ${buyAmount} oINR!\n\nCheck your oINR balance above.`);
+            setBuyAmount('');
         } catch (error) {
             Alert.alert('Error', error.message);
         }
@@ -167,6 +187,46 @@ export default function App() {
             Alert.alert('Error', error.message);
         }
         setLoading(false);
+    }
+
+    async function handleQRPayment(toAddress, amount) {
+        setLoading(true);
+        try {
+            const oINRContract = vaultService.getOINRContract();
+            await walletService.transferOINR(toAddress, amount, oINRContract);
+            await loadData();
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Handle screen navigation
+    if (currentScreen === 'diagnostic' && connected) {
+        return (
+            <DiagnosticScreen onBack={() => setCurrentScreen('home')} />
+        );
+    }
+
+    if (currentScreen === 'receive' && connected) {
+        return (
+            <ReceivePayment
+                walletAddress={address}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'send' && connected) {
+        return (
+            <SendPayment
+                wallet={walletService}
+                onBack={() => setCurrentScreen('home')}
+                onPaymentSuccess={handleQRPayment}
+                oINRBalance={balances?.oinr}
+            />
+        );
     }
 
     if (!connected) {
@@ -251,13 +311,35 @@ export default function App() {
             <ScrollView style={styles.scrollView}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Your Vault</Text>
-                    <Text style={styles.address}>
-                        {address.slice(0, 6)}...{address.slice(-4)}
-                    </Text>
-                    <TouchableOpacity onPress={handleDisconnect}>
-                        <Text style={styles.disconnect}>Disconnect</Text>
-                    </TouchableOpacity>
+                    <View style={styles.headerRow}>
+                        <View>
+                            <Text style={styles.headerTitle}>Your Vault</Text>
+                            <Text style={styles.address}>
+                                {address.slice(0, 6)}...{address.slice(-4)}
+                            </Text>
+                        </View>
+                        <View style={styles.headerButtons}>
+                            <TouchableOpacity
+                                style={styles.diagnosticButton}
+                                onPress={() => setCurrentScreen('diagnostic')}
+                                disabled={loading}
+                            >
+                                <Text style={styles.diagnosticButtonText}>🔧</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.refreshButton}
+                                onPress={handleRefresh}
+                                disabled={loading}
+                            >
+                                <Text style={styles.refreshButtonText}>
+                                    {loading ? '⏳' : '🔄'}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDisconnect}>
+                                <Text style={styles.disconnect}>Disconnect</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Gas Fee Info */}
@@ -416,6 +498,42 @@ export default function App() {
                     </TouchableOpacity>
                 </View>
 
+                {/* QR Payments */}
+                <View style={styles.card}>
+                    <Text style={styles.cardTitle}>📱 UPI-Style QR Payments</Text>
+                    <Text style={styles.qrDescription}>
+                        Send and receive oINR instantly using QR codes
+                    </Text>
+
+                    {balances && parseFloat(balances.oinr) === 0 && (
+                        <View style={[styles.card, { backgroundColor: '#fff3cd', padding: 12, marginBottom: 12 }]}>
+                            <Text style={{ fontSize: 13, color: '#856404' }}>
+                                💡 To send payments, you need oINR. Buy or borrow oINR first using the options above!
+                            </Text>
+                        </View>
+                    )}
+
+                    <View style={styles.qrButtonRow}>
+                        <TouchableOpacity
+                            style={[styles.qrButton, { backgroundColor: '#4CAF50' }]}
+                            onPress={() => setCurrentScreen('receive')}
+                            disabled={loading}
+                        >
+                            <Text style={styles.qrButtonIcon}>📥</Text>
+                            <Text style={styles.qrButtonText}>Receive</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.qrButton, { backgroundColor: '#2196F3' }]}
+                            onPress={() => setCurrentScreen('send')}
+                            disabled={loading}
+                        >
+                            <Text style={styles.qrButtonIcon}>📤</Text>
+                            <Text style={styles.qrButtonText}>Send</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
                 <View style={{ height: 40 }} />
             </ScrollView>
 
@@ -476,6 +594,34 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 20,
         paddingVertical: 10,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    headerButtons: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    refreshButton: {
+        backgroundColor: '#10b981',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    refreshButtonText: {
+        fontSize: 18,
+    },
+    diagnosticButton: {
+        backgroundColor: '#9C27B0',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    diagnosticButtonText: {
+        fontSize: 18,
     },
     headerTitle: {
         fontSize: 28,
@@ -617,5 +763,36 @@ const styles = StyleSheet.create({
         marginTop: 16,
         fontSize: 16,
         fontWeight: '600',
+    },
+    qrDescription: {
+        fontSize: 14,
+        color: '#6b7280',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    qrButtonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    qrButton: {
+        flex: 1,
+        padding: 20,
+        borderRadius: 12,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    qrButtonIcon: {
+        fontSize: 32,
+        marginBottom: 8,
+    },
+    qrButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '700',
     },
 });

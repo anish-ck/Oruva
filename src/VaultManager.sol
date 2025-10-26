@@ -340,4 +340,11 @@ contract VaultManager is ReentrancyGuard, Ownable {
         minCollateralizationRatio = newRatio;
         emit CollateralizationRatioUpdated(newRatio);
     }
+
+    /// @notice Emergency function to mint oINR (admin only) - for fixing failed borrows
+    /// @param to Address to mint to
+    /// @param amount Amount to mint
+    function rescueMintOINR(address to, uint256 amount) external onlyOwner {
+        oinrToken.mint(to, amount);
+    }
 }

@@ -1,0 +1,69 @@
+Compiling 1 files with Solc 0.8.30
+Solc 0.8.30 finished in 344.31ms
+Compiler run successful!
+Script ran successfully.
+
+== Logs ==
+  === FRESH DEPLOYMENT (fixing buyOINR bug) ===
+
+  Deployer: 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
+  Reusing:
+    Oracle: 0xe5cCA233Db9655D8C1a64F74e1d5Bb1253e80f99
+    USDC: 0x5Fda84f0d0985e346ff0fe13dFd7760a9Ff1Ed43
+  
+1. Deploying new oINR...
+     oINR: 0x5b73C5498c1E3b4dbA84de0F1833c4a029d90519
+  
+2. Deploying new VaultEngine...
+     VaultEngine: 0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496
+  
+3. Deploying new CollateralJoin...
+     CollateralJoin: 0x34A1D3fff3958843C43aD80F30b94c510645C316
+  
+4. Deploying new VaultManager...
+     VaultManager: 0x90193C961A926261B756D1E5bb255e67ff9498A1
+  
+5. Setting up permissions...
+     [OK] oINR owned by VaultManager
+     [OK] VaultEngine manager set
+  
+=== DEPLOYMENT COMPLETE ===
+
+  [NEW ADDRESSES]
+  VaultManager: 0x90193C961A926261B756D1E5bb255e67ff9498A1
+  VaultEngine: 0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496
+  oINR: 0x5b73C5498c1E3b4dbA84de0F1833c4a029d90519
+  CollateralJoin: 0x34A1D3fff3958843C43aD80F30b94c510645C316
+  PriceOracle: 0xe5cCA233Db9655D8C1a64F74e1d5Bb1253e80f99 (reused)
+  MockUSDC: 0x5Fda84f0d0985e346ff0fe13dFd7760a9Ff1Ed43 (reused)
+  
+Verifying VaultManager...
+  Min Ratio: 15000 bp
+  
+[SUCCESS] All contracts deployed and configured!
+  
+NEXT STEPS:
+  1. Update CONTRACT_ADDRESSES.json
+  2. Update mobile app config files
+  3. Copy new ABIs to mobile app
+  4. Test buyOINR function!
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 545
+
+Estimated gas price: 0.0000001 gwei
+
+Estimated total gas used for script: 6937836
+
+Estimated amount required: 0.0000000006937836 ETH
+
+==========================
+
+Transactions saved to: /home/anish/stable_coin/broadcast/FreshDeploy.s.sol/545/run-latest.json
+
+Sensitive values saved to: /home/anish/stable_coin/cache/FreshDeploy.s.sol/545/run-latest.json
+
+Error: You seem to be using Foundry's default sender. Be sure to set your own --sender.

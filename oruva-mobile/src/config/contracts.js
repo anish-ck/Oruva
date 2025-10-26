@@ -1,11 +1,11 @@
 // Contract addresses on Flow EVM Testnet
 export const CONTRACTS = {
-    vaultManager: '0x347fe2d1A1789AeDd2cB7eFFC86377b8D208A295',
-    vaultEngine: '0x9Bc8A5BF079dd86F7873C44c4D1FF9CC88dDE35e',
-    oinr: '0x5E6883b7b37A02381325234ECbf13f0729584aD0',
+    vaultManager: '0x5F1311808ED97661D5b31F4C67637D8952a54cc0',
+    vaultEngine: '0xa9255087b8d1B75456eA5d4fc272B884E7A7AE8a',
+    oinr: '0x13d855720E87eC59BFC4E27851027f5D8D8E9Eae',
     mockUSDC: '0x5Fda84f0d0985e346ff0fe13dFd7760a9Ff1Ed43',
     priceOracle: '0xe5cCA233Db9655D8C1a64F74e1d5Bb1253e80f99',
-    collateralJoin: '0xf7d4e2ab21e0a74f342688209F271a188B807Dc6',
+    collateralJoin: '0x0b54a6bf84108d7C8d5a2296Df4a2264b1f7Fd66',
 };
 
 // Import ABIs
