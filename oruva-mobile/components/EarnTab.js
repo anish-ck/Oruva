@@ -37,15 +37,15 @@ export default function EarnTab() {
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Get vault info
       const info = await yieldService.getAllVaultInfo();
       setVaultInfo(info);
-      
+
       // Get token balances from vaultService
       const balanceInfo = await vaultService.getBalances(walletService.address);
       setBalances(balanceInfo);
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Error loading vault data:', error);
@@ -60,7 +60,7 @@ export default function EarnTab() {
       return;
     }
 
-    const vaultAddress = selectedVault === 'USDC' 
+    const vaultAddress = selectedVault === 'USDC'
       ? CONTRACTS.usdcYieldVault
       : CONTRACTS.oinrYieldVault;
 
@@ -85,7 +85,7 @@ export default function EarnTab() {
         'Success!',
         `Deposited ${depositAmount} ${selectedVault}\nNow earning 5% APY!`
       );
-      
+
       setDepositAmount('');
       await loadData();
     } catch (error) {
@@ -111,7 +111,7 @@ export default function EarnTab() {
         'Success!',
         `Withdrew ${withdrawAmount} ${selectedVault}\nYield auto-claimed!`
       );
-      
+
       setWithdrawAmount('');
       await loadData();
     } catch (error) {
@@ -128,15 +128,15 @@ export default function EarnTab() {
 
       await yieldService.claimYield(selectedVault);
 
-      const pendingYield = selectedVault === 'USDC' 
-        ? vaultInfo.usdc.pendingYield 
+      const pendingYield = selectedVault === 'USDC'
+        ? vaultInfo.usdc.pendingYield
         : vaultInfo.oinr.pendingYield;
 
       Alert.alert(
         'Success!',
         `Claimed ${parseFloat(pendingYield).toFixed(6)} ${selectedVault}!`
       );
-      
+
       await loadData();
     } catch (error) {
       console.error('Claim yield error:', error);
@@ -206,7 +206,7 @@ export default function EarnTab() {
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>Deposit Time</Text>
           <Text style={styles.statValue}>
-            {currentVault?.depositTime && currentVault.depositTime !== '0' 
+            {currentVault?.depositTime && currentVault.depositTime !== '0'
               ? new Date(parseInt(currentVault.depositTime) * 1000).toLocaleDateString()
               : 'N/A'}
           </Text>

@@ -12,6 +12,7 @@ import {
     Alert,
     SafeAreaView,
     StatusBar,
+    Clipboard,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import walletService from './src/services/wallet';
@@ -21,6 +22,8 @@ import ReceivePayment from './app/ReceivePayment';
 import SendPayment from './app/SendPayment';
 import DiagnosticScreen from './app/DiagnosticScreen';
 import EarnTab from './components/EarnTab';
+import ProfileTab from './components/ProfileTab';
+import AddINRTab from './components/AddINRTab';
 import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
 
 function AppContent() {
@@ -31,7 +34,7 @@ function AppContent() {
     const [loading, setLoading] = useState(false);
 
     // Screen navigation
-    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn'
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn', 'profile', 'addINR'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -50,10 +53,13 @@ function AppContent() {
         }
     }, [connected, address]);
 
-    // Check if user is already logged in with Magic on app start
+    // Disable auto-login to allow users to choose login method
+    // If you want auto-login back, uncomment this:
+    /*
     useEffect(() => {
         checkMagicLogin();
     }, []);
+    */
 
     async function checkMagicLogin() {
         try {
@@ -279,6 +285,19 @@ function AppContent() {
     }
 
     // Handle screen navigation
+    if (currentScreen === 'profile' && connected) {
+        return (
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.backButton}>
+                    <TouchableOpacity onPress={() => setCurrentScreen('home')}>
+                        <Text style={styles.backButtonText}>← Back</Text>
+                    </TouchableOpacity>
+                </View>
+                <ProfileTab onLogout={handleDisconnect} />
+            </SafeAreaView>
+        );
+    }
+
     if (currentScreen === 'earn' && connected) {
         return (
             <SafeAreaView style={{ flex: 1 }}>
@@ -289,6 +308,17 @@ function AppContent() {
                 </View>
                 <EarnTab />
             </SafeAreaView>
+        );
+    }
+
+    if (currentScreen === 'addINR' && connected) {
+        return (
+            <AddINRTab
+                walletAddress={address}
+                provider={walletService.provider}
+                magic={magic}
+                onBack={() => setCurrentScreen('home')}
+            />
         );
     }
 
@@ -446,13 +476,37 @@ function AppContent() {
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={styles.headerRow}>
-                        <View>
+                        <View style={{ flex: 1 }}>
                             <Text style={styles.headerTitle}>Your Vault</Text>
-                            <Text style={styles.address}>
-                                {address.slice(0, 6)}...{address.slice(-4)}
-                            </Text>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    Clipboard.setString(address);
+                                    Alert.alert('Copied!', 'Address copied to clipboard');
+                                }}
+                                style={styles.addressContainer}
+                            >
+                                <Text style={styles.address} numberOfLines={1}>
+                                    {address}
+                                </Text>
+                                <Text style={styles.copyIcon}>📋</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.copyHint}>Tap to copy full address</Text>
                         </View>
                         <View style={styles.headerButtons}>
+                            <TouchableOpacity
+                                style={styles.addINRButton}
+                                onPress={() => setCurrentScreen('addINR')}
+                                disabled={loading}
+                            >
+                                <Text style={styles.addINRButtonText}>💰</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.profileButton}
+                                onPress={() => setCurrentScreen('profile')}
+                                disabled={loading}
+                            >
+                                <Text style={styles.profileButtonText}>�</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.diagnosticButton}
                                 onPress={() => setCurrentScreen('diagnostic')}
@@ -468,9 +522,6 @@ function AppContent() {
                                 <Text style={styles.refreshButtonText}>
                                     {loading ? '⏳' : '🔄'}
                                 </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={handleDisconnect}>
-                                <Text style={styles.disconnect}>Disconnect</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -764,6 +815,26 @@ const styles = StyleSheet.create({
     refreshButtonText: {
         fontSize: 18,
     },
+    addINRButton: {
+        backgroundColor: '#FF9800',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        marginRight: 8,
+    },
+    addINRButtonText: {
+        fontSize: 18,
+    },
+    profileButton: {
+        backgroundColor: '#2196F3',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        marginRight: 8,
+    },
+    profileButtonText: {
+        fontSize: 18,
+    },
     diagnosticButton: {
         backgroundColor: '#9C27B0',
         paddingHorizontal: 12,
@@ -779,11 +850,28 @@ const styles = StyleSheet.create({
         color: '#1f2937',
         marginBottom: 8,
     },
+    addressContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f3f4f6',
+        padding: 8,
+        borderRadius: 8,
+        marginBottom: 4,
+    },
     address: {
-        fontSize: 14,
-        color: '#6b7280',
-        marginBottom: 8,
+        fontSize: 12,
+        color: '#1f2937',
         fontFamily: 'monospace',
+        flex: 1,
+    },
+    copyIcon: {
+        fontSize: 16,
+        marginLeft: 8,
+    },
+    copyHint: {
+        fontSize: 10,
+        color: '#9ca3af',
+        fontStyle: 'italic',
     },
     disconnect: {
         fontSize: 14,
@@ -958,6 +1046,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         padding: 16,
+        paddingTop: 50,
         backgroundColor: 'white',
     },
     backButtonText: {

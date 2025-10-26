@@ -57,10 +57,10 @@ class YieldService {
    */
   async getUserInfo(vaultType) {
     const vault = vaultType === 'USDC' ? this.usdcVault : this.oinrVault;
-    
+
     try {
       const [depositedAmount, pendingYield, depositTime, lastClaimTime] = await vault.getUserInfo(this.userAddress);
-      
+
       return {
         depositAmount: ethers.utils.formatUnits(
           depositedAmount,
@@ -96,7 +96,7 @@ class YieldService {
       console.log(`Depositing ${amount} ${vaultType} to yield vault...`);
       const tx = await vault.deposit(amountWei);
       console.log('Transaction hash:', tx.hash);
-      
+
       const receipt = await tx.wait();
       console.log('Deposit successful!');
       return receipt;
@@ -118,7 +118,7 @@ class YieldService {
       console.log(`Withdrawing ${amount} ${vaultType} from yield vault...`);
       const tx = await vault.withdraw(amountWei);
       console.log('Transaction hash:', tx.hash);
-      
+
       const receipt = await tx.wait();
       console.log('Withdrawal successful!');
       return receipt;
@@ -138,7 +138,7 @@ class YieldService {
       console.log(`Claiming ${vaultType} yield...`);
       const tx = await vault.claimYield();
       console.log('Transaction hash:', tx.hash);
-      
+
       const receipt = await tx.wait();
       console.log('Yield claimed successfully!');
       return receipt;
@@ -153,7 +153,7 @@ class YieldService {
    */
   async getAPY(vaultType) {
     const vault = vaultType === 'USDC' ? this.usdcVault : this.oinrVault;
-    
+
     try {
       const apyBps = await vault.apyBasisPoints();
       return apyBps.toNumber() / 100; // Convert basis points to percentage
