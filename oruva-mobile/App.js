@@ -956,6 +956,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
     },
+    backButton: {
+        padding: 16,
+        backgroundColor: 'white',
+    },
+    backButtonText: {
+        fontSize: 16,
+        color: '#2196F3',
+        fontWeight: '600',
+    },
 });
 
 // Main App component with Magic Relayer
