@@ -8,13 +8,14 @@
 import { Magic } from '@magic-sdk/react-native-expo';
 import { OAuthExtension } from '@magic-ext/react-native-expo-oauth';
 
-// Magic publishable API key from https://dashboard.magic.link/
-const MAGIC_API_KEY = 'pk_live_54060FFBAB0C240F';
+// Magic publishable API key from environment variables
+// Set in .env file as EXPO_PUBLIC_MAGIC_PUBLISHABLE_KEY
+const MAGIC_API_KEY = process.env.EXPO_PUBLIC_MAGIC_PUBLISHABLE_KEY || 'pk_live_54060FFBAB0C240F';
 
-// Flow EVM Testnet configuration
+// Flow EVM Testnet configuration from environment variables
 const FLOW_EVM_TESTNET = {
-  rpcUrl: 'https://testnet.evm.nodes.onflow.org',
-  chainId: 545,
+  rpcUrl: process.env.EXPO_PUBLIC_FLOW_EVM_RPC_URL || 'https://testnet.evm.nodes.onflow.org',
+  chainId: parseInt(process.env.EXPO_PUBLIC_FLOW_EVM_CHAIN_ID || '545'),
 };
 
 /**
