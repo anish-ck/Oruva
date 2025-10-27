@@ -1,21 +1,22 @@
 import 'react-native-get-random-values';
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-    TextInput,
-    ScrollView,
-    ActivityIndicator,
-    Alert,
-    SafeAreaView,
-    StatusBar,
-    Clipboard,
+import { 
+    Alert, 
+    Clipboard, 
+    View, 
+    Text, 
+    TextInput, 
+    TouchableOpacity, 
+    ScrollView, 
+    StyleSheet, 
+    StatusBar 
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import '@/global.css';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
 import yieldService from './src/services/yield';
@@ -28,6 +29,7 @@ import AddINRTab from './components/AddINRTab';
 import AadhaarVerification from './components/AadhaarVerification';
 import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
 import aadhaarService from './src/services/aadhaar';
+import LoginScreen from './components/LoginScreen';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -125,7 +127,7 @@ function AppContent() {
 
                 Alert.alert(
                     'Welcome Back!',
-                    `Hi ${kycStatus.data.name}! 👋\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`
+                    `Hi ${kycStatus.data.name}!\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`
                 );
             } else {
                 // New user - show Aadhaar verification
@@ -160,7 +162,7 @@ function AppContent() {
             await yieldService.initialize(walletService.signer, addr);
 
             Alert.alert(
-                '🎉 Welcome to Oruva!',
+                'Welcome to Oruva!',
                 `Hi ${userData.name}!\n\nYour KYC is complete and wallet is ready.\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`
             );
         } catch (error) {
@@ -171,8 +173,8 @@ function AppContent() {
 
     function handleSkipAadhaar() {
         Alert.alert(
-            '⚠️ Skip KYC?',
-            'Without KYC verification:\n\n❌ Cannot add INR via Cashfree\n❌ Limited transaction amounts\n❌ Some features unavailable\n\nYou can complete KYC later from Profile.\n\nContinue without KYC?',
+            'Skip KYC?',
+            'Without KYC verification:\n\n• Cannot add INR via Cashfree\n• Limited transaction amounts\n• Some features unavailable\n\nYou can complete KYC later from Profile.\n\nContinue without KYC?',
             [
                 { text: 'Go Back', style: 'cancel' },
                 {
@@ -193,7 +195,7 @@ function AppContent() {
                             await yieldService.initialize(walletService.signer, addr);
 
                             Alert.alert(
-                                '✅ Wallet Created',
+                                'Wallet Created',
                                 'You can complete KYC verification anytime from the Profile tab to unlock all features.'
                             );
                         } catch (error) {
@@ -385,11 +387,15 @@ function AppContent() {
     // Show Aadhaar verification screen after Magic Link login
     if (showAadhaarVerification && !connected) {
         return (
-            <AadhaarVerification
+            
+    <GluestackUIProvider mode="dark">
+      <AadhaarVerification
                 email={email}
                 onVerificationComplete={handleAadhaarVerificationComplete}
                 onSkip={handleSkipAadhaar}
             />
+    </GluestackUIProvider>
+  
         );
     }
 
@@ -459,157 +465,19 @@ function AppContent() {
 
     if (!connected) {
         return (
-            <View style={styles.loginContainer}>
-                <LinearGradient
-                    colors={['#6366F1', '#8B5CF6']}
-                    style={styles.loginGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                >
-                    <StatusBar barStyle="light-content" />
-
-                    {/* Logo */}
-                    <View style={styles.logoSection}>
-                        <Text style={styles.logo}>🏦</Text>
-                        <Text style={styles.appName}>Oruva</Text>
-                        <Text style={styles.tagline}>DeFi Banking for India</Text>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>Flow EVM Testnet</Text>
-                        </View>
-                    </View>
-
-                    {/* Login Card */}
-                    <View style={styles.loginCard}>
-                        {!importMode && !magicMode ? (
-                            <>
-                                <Text style={styles.cardTitle}>Welcome</Text>
-
-                                <TouchableOpacity
-                                    style={styles.gradientBtn}
-                                    onPress={() => setMagicMode(true)}
-                                    disabled={loading}
-                                >
-                                    <LinearGradient
-                                        colors={['#6366F1', '#8B5CF6']}
-                                        style={styles.gradientBtnInner}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 0 }}
-                                    >
-                                        <Text style={styles.gradientBtnText}>🪄 Login with Magic Link</Text>
-                                    </LinearGradient>
-                                </TouchableOpacity>
-
-                                <Text style={styles.orText}>OR</Text>
-
-                                <TouchableOpacity
-                                    style={styles.outlineBtn}
-                                    onPress={handleConnect}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <ActivityIndicator color="#6366F1" />
-                                    ) : (
-                                        <Text style={styles.outlineBtnText}>Create New Wallet</Text>
-                                    )}
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={styles.textBtn}
-                                    onPress={() => setImportMode(true)}
-                                >
-                                    <Text style={styles.textBtnText}>Import MetaMask Wallet</Text>
-                                </TouchableOpacity>
-                            </>
-                        ) : magicMode ? (
-                            <>
-                                <Text style={styles.cardTitle}>Magic Link</Text>
-
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="your@email.com"
-                                    placeholderTextColor="#9CA3AF"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                />
-
-                                <TouchableOpacity
-                                    style={styles.gradientBtn}
-                                    onPress={handleMagicLogin}
-                                    disabled={loading || !email}
-                                >
-                                    <LinearGradient
-                                        colors={['#6366F1', '#8B5CF6']}
-                                        style={styles.gradientBtnInner}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 0 }}
-                                    >
-                                        {loading ? (
-                                            <ActivityIndicator color="white" />
-                                        ) : (
-                                            <Text style={styles.gradientBtnText}>Send Magic Link</Text>
-                                        )}
-                                    </LinearGradient>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={styles.textBtn}
-                                    onPress={() => {
-                                        setMagicMode(false);
-                                        setEmail('');
-                                    }}
-                                >
-                                    <Text style={styles.textBtnText}>← Back</Text>
-                                </TouchableOpacity>
-                            </>
-                        ) : (
-                            <>
-                                <Text style={styles.cardTitle}>Import Wallet</Text>
-
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Private Key (0x...)"
-                                    placeholderTextColor="#9CA3AF"
-                                    value={privateKey}
-                                    onChangeText={setPrivateKey}
-                                    secureTextEntry={true}
-                                    autoCapitalize="none"
-                                />
-
-                                <TouchableOpacity
-                                    style={styles.gradientBtn}
-                                    onPress={handleConnect}
-                                    disabled={loading || !privateKey}
-                                >
-                                    <LinearGradient
-                                        colors={['#6366F1', '#8B5CF6']}
-                                        style={styles.gradientBtnInner}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 0 }}
-                                    >
-                                        {loading ? (
-                                            <ActivityIndicator color="white" />
-                                        ) : (
-                                            <Text style={styles.gradientBtnText}>Import</Text>
-                                        )}
-                                    </LinearGradient>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    style={styles.textBtn}
-                                    onPress={() => {
-                                        setImportMode(false);
-                                        setPrivateKey('');
-                                    }}
-                                >
-                                    <Text style={styles.textBtnText}>← Back</Text>
-                                </TouchableOpacity>
-                            </>
-                        )}
-                    </View>
-                </LinearGradient>
-            </View>
+            <LoginScreen
+                email={email}
+                setEmail={setEmail}
+                privateKey={privateKey}
+                setPrivateKey={setPrivateKey}
+                importMode={importMode}
+                setImportMode={setImportMode}
+                magicMode={magicMode}
+                setMagicMode={setMagicMode}
+                loading={loading}
+                handleConnect={handleConnect}
+                handleMagicLogin={handleMagicLogin}
+            />
         );
     }
 
@@ -632,21 +500,21 @@ function AppContent() {
                                 <Text style={styles.address} numberOfLines={1}>
                                     {address}
                                 </Text>
-                                <Text style={styles.copyIcon}>📋</Text>
+                                <Text style={styles.copyIcon}>�</Text>
                             </TouchableOpacity>
                             <Text style={styles.copyHint}>Tap to copy full address</Text>
 
                             {/* KYC Status Badge */}
                             {kycVerified && kycData ? (
                                 <View style={styles.kycBadge}>
-                                    <Text style={styles.kycBadgeText}>✅ KYC Verified - {kycData.name}</Text>
+                                    <Text style={styles.kycBadgeText}>KYC Verified - {kycData.name}</Text>
                                 </View>
                             ) : (
                                 <TouchableOpacity
                                     style={styles.kycWarningBadge}
                                     onPress={() => setCurrentScreen('profile')}
                                 >
-                                    <Text style={styles.kycWarningText}>⚠️ Complete KYC to unlock all features</Text>
+                                    <Text style={styles.kycWarningText}>Complete KYC to unlock all features</Text>
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -656,7 +524,7 @@ function AppContent() {
                                 onPress={() => {
                                     if (!kycVerified) {
                                         Alert.alert(
-                                            '🔒 KYC Required',
+                                            'KYC Required',
                                             'Please complete Aadhaar verification to add INR via Cashfree.',
                                             [
                                                 { text: 'Cancel', style: 'cancel' },
@@ -672,7 +540,7 @@ function AppContent() {
                                 }}
                                 disabled={loading}
                             >
-                                <Text style={styles.addINRButtonText}>💰</Text>
+                                <Text style={styles.addINRButtonText}>₹</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.profileButton}
@@ -686,7 +554,7 @@ function AppContent() {
                                 onPress={() => setCurrentScreen('diagnostic')}
                                 disabled={loading}
                             >
-                                <Text style={styles.diagnosticButtonText}>🔧</Text>
+                                <Text style={styles.diagnosticButtonText}>⚙</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.refreshButton}
@@ -694,7 +562,7 @@ function AppContent() {
                                 disabled={loading}
                             >
                                 <Text style={styles.refreshButtonText}>
-                                    {loading ? '⏳' : '🔄'}
+                                    {loading ? '...' : '↻'}
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -703,7 +571,7 @@ function AppContent() {
 
                 {/* Gas Fee Info */}
                 <View style={[styles.card, { backgroundColor: '#fef3c7' }]}>
-                    <Text style={styles.cardTitle}>⚠️ Need Gas Fees</Text>
+                    <Text style={styles.cardTitle}>Need Gas Fees</Text>
                     <Text style={styles.warningText}>
                         To make transactions, you need FLOW tokens for gas fees.
                     </Text>
@@ -717,7 +585,7 @@ function AppContent() {
 
                 {/* Balances */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>💰 Your Balances</Text>
+                    <Text style={styles.cardTitle}>Your Balances</Text>
                     <View style={styles.balanceRow}>
                         <Text style={styles.balanceLabel}>USDC:</Text>
                         <Text style={styles.balanceValue}>{balances?.usdc || '0'}</Text>
@@ -730,7 +598,7 @@ function AppContent() {
 
                 {/* Vault Info */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>📊 Vault Status</Text>
+                    <Text style={styles.cardTitle}>Vault Status</Text>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Collateral:</Text>
                         <Text style={styles.infoValue}>{vaultInfo?.collateral || '0'} USDC</Text>
@@ -753,13 +621,13 @@ function AppContent() {
                             { color: vaultInfo?.isHealthy ? '#10b981' : '#ef4444' },
                         ]}
                     >
-                        {vaultInfo?.isHealthy ? '✅ Healthy' : '⚠️ Undercollateralized'}
+                        {vaultInfo?.isHealthy ? 'Healthy' : 'Undercollateralized'}
                     </Text>
                 </View>
 
                 {/* Mint Test USDC */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>🪙 Mint Test USDC</Text>
+                    <Text style={styles.cardTitle}>Mint Test USDC</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Amount (e.g., 1000)"
@@ -779,7 +647,7 @@ function AppContent() {
 
                 {/* Deposit */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>💵 Deposit Collateral</Text>
+                    <Text style={styles.cardTitle}>Deposit Collateral</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Amount (USDC)"
@@ -799,7 +667,7 @@ function AppContent() {
 
                 {/* Borrow */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>💸 Borrow oINR</Text>
+                    <Text style={styles.cardTitle}>Borrow oINR</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Amount (oINR)"
@@ -819,7 +687,7 @@ function AppContent() {
 
                 {/* Buy oINR */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>🛒 Buy oINR</Text>
+                    <Text style={styles.cardTitle}>Buy oINR</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Amount (oINR)"
@@ -839,7 +707,7 @@ function AppContent() {
 
                 {/* Repay */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>💳 Repay Debt</Text>
+                    <Text style={styles.cardTitle}>Repay Debt</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Amount (oINR)"
@@ -859,7 +727,7 @@ function AppContent() {
 
                 {/* QR Payments */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>📱 UPI-Style QR Payments</Text>
+                    <Text style={styles.cardTitle}>UPI-Style QR Payments</Text>
                     <Text style={styles.qrDescription}>
                         Send and receive oINR instantly using QR codes
                     </Text>
@@ -867,7 +735,7 @@ function AppContent() {
                     {balances && parseFloat(balances.oinr) === 0 && (
                         <View style={[styles.card, { backgroundColor: '#fff3cd', padding: 12, marginBottom: 12 }]}>
                             <Text style={{ fontSize: 13, color: '#856404' }}>
-                                💡 To send payments, you need oINR. Buy or borrow oINR first using the options above!
+                                Tip: To send payments, you need oINR. Buy or borrow oINR first using the options above!
                             </Text>
                         </View>
                     )}
@@ -878,7 +746,7 @@ function AppContent() {
                             onPress={() => setCurrentScreen('receive')}
                             disabled={loading}
                         >
-                            <Text style={styles.qrButtonIcon}>📥</Text>
+                            <Text style={styles.qrButtonIcon}>↓</Text>
                             <Text style={styles.qrButtonText}>Receive</Text>
                         </TouchableOpacity>
 
@@ -887,7 +755,7 @@ function AppContent() {
                             onPress={() => setCurrentScreen('send')}
                             disabled={loading}
                         >
-                            <Text style={styles.qrButtonIcon}>📤</Text>
+                            <Text style={styles.qrButtonIcon}>↑</Text>
                             <Text style={styles.qrButtonText}>Send</Text>
                         </TouchableOpacity>
                     </View>
@@ -895,7 +763,7 @@ function AppContent() {
 
                 {/* Earn Tab */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>💰 Earn Passive Income</Text>
+                    <Text style={styles.cardTitle}>Earn Passive Income</Text>
                     <Text style={styles.qrDescription}>
                         Deposit USDC or oINR to earn 5% APY
                     </Text>
@@ -905,7 +773,7 @@ function AppContent() {
                         onPress={() => setCurrentScreen('earn')}
                         disabled={loading}
                     >
-                        <Text style={styles.buttonText}>💎 Open Earn Tab</Text>
+                        <Text style={styles.buttonText}>Open Earn Tab</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -1360,15 +1228,17 @@ const styles = StyleSheet.create({
     },
 });
 
-// Main App component with Magic Relayer
+// Main App component with Gluestack UI and Magic Relayer
 export default function App() {
     return (
-        <SafeAreaProvider>
-            {/* Magic Relayer - REQUIRED for Magic authentication to work */}
-            <magic.Relayer backgroundColor="#f3f4f6" />
+        <GluestackUIProvider>
+            <SafeAreaProvider>
+                {/* Magic Relayer - REQUIRED for Magic authentication to work */}
+                <magic.Relayer />
 
-            {/* Main app content */}
-            <AppContent />
-        </SafeAreaProvider>
+                {/* Main app content */}
+                <AppContent />
+            </SafeAreaProvider>
+        </GluestackUIProvider>
     );
 }
