@@ -14,6 +14,7 @@ import {
     StatusBar,
     Clipboard,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import walletService from './src/services/wallet';
 import vaultService from './src/services/vault';
@@ -24,7 +25,9 @@ import DiagnosticScreen from './app/DiagnosticScreen';
 import EarnTab from './components/EarnTab';
 import ProfileTab from './components/ProfileTab';
 import AddINRTab from './components/AddINRTab';
+import AadhaarVerification from './components/AadhaarVerification';
 import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
+import aadhaarService from './src/services/aadhaar';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -32,6 +35,11 @@ function AppContent() {
     const [vaultInfo, setVaultInfo] = useState(null);
     const [balances, setBalances] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // KYC/Aadhaar states
+    const [showAadhaarVerification, setShowAadhaarVerification] = useState(false);
+    const [kycData, setKycData] = useState(null);
+    const [kycVerified, setKycVerified] = useState(false);
 
     // Screen navigation
     const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn', 'profile', 'addINR'
@@ -95,7 +103,54 @@ function AppContent() {
             const addr = await getUserAddress();
             console.log('Magic wallet address:', addr);
 
-            // Connect wallet service with Magic provider
+            // Check if user has completed KYC
+            console.log('Checking KYC status for:', email);
+            const kycStatus = await aadhaarService.checkKYCStatus(email);
+            console.log('KYC Status:', kycStatus);
+
+            if (kycStatus.verified) {
+                // Returning user with KYC completed
+                console.log('✅ User already KYC verified');
+                setKycData(kycStatus.data);
+                setKycVerified(true);
+
+                // Connect wallet service with Magic provider
+                const magicProvider = getMagicProvider();
+                await walletService.connectWithMagic(magicProvider, addr);
+
+                setAddress(addr);
+                setConnected(true);
+                vaultService.initialize();
+                await yieldService.initialize(walletService.signer, addr);
+
+                Alert.alert(
+                    'Welcome Back!',
+                    `Hi ${kycStatus.data.name}! 👋\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`
+                );
+            } else {
+                // New user - show Aadhaar verification
+                console.log('🆕 New user - showing Aadhaar verification');
+                setShowAadhaarVerification(true);
+            }
+        } catch (error) {
+            console.error('Magic login error:', error);
+            Alert.alert('Error', 'Magic login failed: ' + error.message);
+        }
+        setLoading(false);
+    }
+
+    async function handleAadhaarVerificationComplete(userData) {
+        console.log('✅ Aadhaar verification complete:', userData);
+        setKycData(userData);
+        setKycVerified(true);
+        setShowAadhaarVerification(false);
+
+        try {
+            // Get address from Magic
+            const addr = await getUserAddress();
+            console.log('Creating wallet for:', addr);
+
+            // Connect wallet
             const magicProvider = getMagicProvider();
             await walletService.connectWithMagic(magicProvider, addr);
 
@@ -103,12 +158,52 @@ function AppContent() {
             setConnected(true);
             vaultService.initialize();
             await yieldService.initialize(walletService.signer, addr);
-            Alert.alert('Success', `Magic Link login successful!\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
+
+            Alert.alert(
+                '🎉 Welcome to Oruva!',
+                `Hi ${userData.name}!\n\nYour KYC is complete and wallet is ready.\n\nWallet: ${addr.slice(0, 6)}...${addr.slice(-4)}`
+            );
         } catch (error) {
-            console.error('Magic login error:', error);
-            Alert.alert('Error', 'Magic login failed: ' + error.message);
+            console.error('Wallet creation error:', error);
+            Alert.alert('Error', 'Failed to create wallet: ' + error.message);
         }
-        setLoading(false);
+    }
+
+    function handleSkipAadhaar() {
+        Alert.alert(
+            '⚠️ Skip KYC?',
+            'Without KYC verification:\n\n❌ Cannot add INR via Cashfree\n❌ Limited transaction amounts\n❌ Some features unavailable\n\nYou can complete KYC later from Profile.\n\nContinue without KYC?',
+            [
+                { text: 'Go Back', style: 'cancel' },
+                {
+                    text: 'Skip KYC',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setShowAadhaarVerification(false);
+                        setKycVerified(false);
+
+                        try {
+                            const addr = await getUserAddress();
+                            const magicProvider = getMagicProvider();
+                            await walletService.connectWithMagic(magicProvider, addr);
+
+                            setAddress(addr);
+                            setConnected(true);
+                            vaultService.initialize();
+                            await yieldService.initialize(walletService.signer, addr);
+
+                            Alert.alert(
+                                '✅ Wallet Created',
+                                'You can complete KYC verification anytime from the Profile tab to unlock all features.'
+                            );
+                        } catch (error) {
+                            console.error('Wallet creation error:', error);
+                            Alert.alert('Error', 'Failed to create wallet: ' + error.message);
+                        }
+                    }
+                }
+            ]
+        );
     }
 
     async function handleConnect() {
@@ -154,6 +249,9 @@ function AppContent() {
         setEmail('');
         setMagicMode(false);
         setImportMode(false);
+        setKycData(null);
+        setKycVerified(false);
+        setShowAadhaarVerification(false);
     }
 
     async function loadData() {
@@ -284,6 +382,17 @@ function AppContent() {
         }
     }
 
+    // Show Aadhaar verification screen after Magic Link login
+    if (showAadhaarVerification && !connected) {
+        return (
+            <AadhaarVerification
+                email={email}
+                onVerificationComplete={handleAadhaarVerificationComplete}
+                onSkip={handleSkipAadhaar}
+            />
+        );
+    }
+
     // Handle screen navigation
     if (currentScreen === 'profile' && connected) {
         return (
@@ -350,122 +459,157 @@ function AppContent() {
 
     if (!connected) {
         return (
-            <SafeAreaView style={styles.container}>
-                <StatusBar barStyle="dark-content" />
-                <View style={styles.centerContainer}>
-                    <Text style={styles.logo}>🏦</Text>
-                    <Text style={styles.title}>Oruva DeFi Bank</Text>
-                    <Text style={styles.subtitle}>Borrow INR Stablecoin</Text>
-                    <Text style={styles.network}>Flow EVM Testnet</Text>
+            <View style={styles.loginContainer}>
+                <LinearGradient
+                    colors={['#6366F1', '#8B5CF6']}
+                    style={styles.loginGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                >
+                    <StatusBar barStyle="light-content" />
 
-                    {!importMode && !magicMode ? (
-                        <>
-                            <TouchableOpacity
-                                style={[styles.connectButton, { backgroundColor: '#8b5cf6' }]}
-                                onPress={() => setMagicMode(true)}
-                                disabled={loading}
-                            >
-                                <Text style={styles.buttonText}>🪄 Login with Magic Link</Text>
-                            </TouchableOpacity>
+                    {/* Logo */}
+                    <View style={styles.logoSection}>
+                        <Text style={styles.logo}>🏦</Text>
+                        <Text style={styles.appName}>Oruva</Text>
+                        <Text style={styles.tagline}>DeFi Banking for India</Text>
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>Flow EVM Testnet</Text>
+                        </View>
+                    </View>
 
-                            <TouchableOpacity
-                                style={[styles.connectButton, { marginTop: 12 }]}
-                                onPress={handleConnect}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <Text style={styles.buttonText}>Create New Wallet</Text>
-                                )}
-                            </TouchableOpacity>
+                    {/* Login Card */}
+                    <View style={styles.loginCard}>
+                        {!importMode && !magicMode ? (
+                            <>
+                                <Text style={styles.cardTitle}>Welcome</Text>
 
-                            <TouchableOpacity
-                                style={[styles.connectButton, { backgroundColor: '#10b981', marginTop: 12 }]}
-                                onPress={() => setImportMode(true)}
-                            >
-                                <Text style={styles.buttonText}>Import MetaMask Wallet</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.gradientBtn}
+                                    onPress={() => setMagicMode(true)}
+                                    disabled={loading}
+                                >
+                                    <LinearGradient
+                                        colors={['#6366F1', '#8B5CF6']}
+                                        style={styles.gradientBtnInner}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                    >
+                                        <Text style={styles.gradientBtnText}>🪄 Login with Magic Link</Text>
+                                    </LinearGradient>
+                                </TouchableOpacity>
 
-                            <Text style={styles.hint}>Login with email or create/import wallet</Text>
-                        </>
-                    ) : magicMode ? (
-                        <>
-                            <TextInput
-                                style={styles.emailInput}
-                                placeholder="Enter your email"
-                                placeholderTextColor="#9ca3af"
-                                value={email}
-                                onChangeText={setEmail}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
+                                <Text style={styles.orText}>OR</Text>
 
-                            <TouchableOpacity
-                                style={[styles.connectButton, { backgroundColor: '#8b5cf6' }]}
-                                onPress={handleMagicLogin}
-                                disabled={loading || !email}
-                            >
-                                {loading ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <Text style={styles.buttonText}>Send Magic Link</Text>
-                                )}
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.outlineBtn}
+                                    onPress={handleConnect}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <ActivityIndicator color="#6366F1" />
+                                    ) : (
+                                        <Text style={styles.outlineBtnText}>Create New Wallet</Text>
+                                    )}
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[styles.connectButton, { backgroundColor: '#6b7280', marginTop: 12 }]}
-                                onPress={() => {
-                                    setMagicMode(false);
-                                    setEmail('');
-                                }}
-                            >
-                                <Text style={styles.buttonText}>Back</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.textBtn}
+                                    onPress={() => setImportMode(true)}
+                                >
+                                    <Text style={styles.textBtnText}>Import MetaMask Wallet</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : magicMode ? (
+                            <>
+                                <Text style={styles.cardTitle}>Magic Link</Text>
 
-                            <Text style={styles.hint}>✨ No password needed - check your email for login link</Text>
-                        </>
-                    ) : (
-                        <>
-                            <TextInput
-                                style={styles.privateKeyInput}
-                                placeholder="Paste your private key (0x...)"
-                                placeholderTextColor="#9ca3af"
-                                value={privateKey}
-                                onChangeText={setPrivateKey}
-                                secureTextEntry={true}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="your@email.com"
+                                    placeholderTextColor="#9CA3AF"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                />
 
-                            <TouchableOpacity
-                                style={styles.connectButton}
-                                onPress={handleConnect}
-                                disabled={loading || !privateKey}
-                            >
-                                {loading ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <Text style={styles.buttonText}>Import Wallet</Text>
-                                )}
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.gradientBtn}
+                                    onPress={handleMagicLogin}
+                                    disabled={loading || !email}
+                                >
+                                    <LinearGradient
+                                        colors={['#6366F1', '#8B5CF6']}
+                                        style={styles.gradientBtnInner}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <Text style={styles.gradientBtnText}>Send Magic Link</Text>
+                                        )}
+                                    </LinearGradient>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[styles.connectButton, { backgroundColor: '#6b7280', marginTop: 12 }]}
-                                onPress={() => {
-                                    setImportMode(false);
-                                    setPrivateKey('');
-                                }}
-                            >
-                                <Text style={styles.buttonText}>Back</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.textBtn}
+                                    onPress={() => {
+                                        setMagicMode(false);
+                                        setEmail('');
+                                    }}
+                                >
+                                    <Text style={styles.textBtnText}>← Back</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <>
+                                <Text style={styles.cardTitle}>Import Wallet</Text>
 
-                            <Text style={styles.hint}>⚠️ Your private key is stored securely in app storage</Text>
-                        </>
-                    )}
-                </View>
-            </SafeAreaView>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Private Key (0x...)"
+                                    placeholderTextColor="#9CA3AF"
+                                    value={privateKey}
+                                    onChangeText={setPrivateKey}
+                                    secureTextEntry={true}
+                                    autoCapitalize="none"
+                                />
+
+                                <TouchableOpacity
+                                    style={styles.gradientBtn}
+                                    onPress={handleConnect}
+                                    disabled={loading || !privateKey}
+                                >
+                                    <LinearGradient
+                                        colors={['#6366F1', '#8B5CF6']}
+                                        style={styles.gradientBtnInner}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <Text style={styles.gradientBtnText}>Import</Text>
+                                        )}
+                                    </LinearGradient>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.textBtn}
+                                    onPress={() => {
+                                        setImportMode(false);
+                                        setPrivateKey('');
+                                    }}
+                                >
+                                    <Text style={styles.textBtnText}>← Back</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
+                    </View>
+                </LinearGradient>
+            </View>
         );
     }
 
@@ -491,11 +635,41 @@ function AppContent() {
                                 <Text style={styles.copyIcon}>📋</Text>
                             </TouchableOpacity>
                             <Text style={styles.copyHint}>Tap to copy full address</Text>
+
+                            {/* KYC Status Badge */}
+                            {kycVerified && kycData ? (
+                                <View style={styles.kycBadge}>
+                                    <Text style={styles.kycBadgeText}>✅ KYC Verified - {kycData.name}</Text>
+                                </View>
+                            ) : (
+                                <TouchableOpacity
+                                    style={styles.kycWarningBadge}
+                                    onPress={() => setCurrentScreen('profile')}
+                                >
+                                    <Text style={styles.kycWarningText}>⚠️ Complete KYC to unlock all features</Text>
+                                </TouchableOpacity>
+                            )}
                         </View>
                         <View style={styles.headerButtons}>
                             <TouchableOpacity
                                 style={styles.addINRButton}
-                                onPress={() => setCurrentScreen('addINR')}
+                                onPress={() => {
+                                    if (!kycVerified) {
+                                        Alert.alert(
+                                            '🔒 KYC Required',
+                                            'Please complete Aadhaar verification to add INR via Cashfree.',
+                                            [
+                                                { text: 'Cancel', style: 'cancel' },
+                                                {
+                                                    text: 'Complete KYC',
+                                                    onPress: () => setCurrentScreen('profile')
+                                                }
+                                            ]
+                                        );
+                                    } else {
+                                        setCurrentScreen('addINR');
+                                    }
+                                }}
                                 disabled={loading}
                             >
                                 <Text style={styles.addINRButtonText}>💰</Text>
@@ -749,6 +923,110 @@ function AppContent() {
 }
 
 const styles = StyleSheet.create({
+    // Login Screen - Simple & Clean
+    loginContainer: {
+        flex: 1,
+    },
+    loginGradient: {
+        flex: 1,
+        justifyContent: 'space-between',
+        padding: 20,
+        paddingTop: 80,
+        paddingBottom: 40,
+    },
+    logoSection: {
+        alignItems: 'center',
+    },
+    logo: {
+        fontSize: 80,
+        marginBottom: 16,
+    },
+    appName: {
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 8,
+    },
+    tagline: {
+        fontSize: 16,
+        color: 'white',
+        opacity: 0.9,
+    },
+    badge: {
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        marginTop: 12,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    loginCard: {
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 24,
+    },
+    cardTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#111827',
+    },
+    gradientBtn: {
+        borderRadius: 12,
+        overflow: 'hidden',
+        marginBottom: 12,
+    },
+    gradientBtnInner: {
+        padding: 16,
+        alignItems: 'center',
+    },
+    gradientBtnText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    outlineBtn: {
+        borderWidth: 2,
+        borderColor: '#6366F1',
+        borderRadius: 12,
+        padding: 14,
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    outlineBtnText: {
+        color: '#6366F1',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    textBtn: {
+        padding: 12,
+        alignItems: 'center',
+    },
+    textBtnText: {
+        color: '#6B7280',
+        fontSize: 14,
+    },
+    orText: {
+        textAlign: 'center',
+        color: '#9CA3AF',
+        marginVertical: 12,
+        fontSize: 12,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 12,
+        padding: 16,
+        fontSize: 16,
+        marginBottom: 16,
+        backgroundColor: '#F9FAFB',
+    },
+
+    // Original Styles (kept for backward compatibility)
     container: {
         flex: 1,
         backgroundColor: '#f3f4f6',
@@ -872,6 +1150,32 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#9ca3af',
         fontStyle: 'italic',
+    },
+    kycBadge: {
+        backgroundColor: '#d1fae5',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        marginTop: 8,
+        alignSelf: 'flex-start',
+    },
+    kycBadgeText: {
+        fontSize: 11,
+        color: '#065f46',
+        fontWeight: '600',
+    },
+    kycWarningBadge: {
+        backgroundColor: '#fef3c7',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        marginTop: 8,
+        alignSelf: 'flex-start',
+    },
+    kycWarningText: {
+        fontSize: 11,
+        color: '#92400e',
+        fontWeight: '600',
     },
     disconnect: {
         fontSize: 14,

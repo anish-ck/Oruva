@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cashfreeRoutes = require('./routes/cashfree');
+const aadhaarRoutes = require('./routes/aadhaar');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,13 +18,15 @@ app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
 
 // Routes
 app.use('/api', cashfreeRoutes);
+app.use('/api/aadhaar', aadhaarRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
         message: 'Oruva Backend is running',
-        environment: process.env.CASHFREE_ENVIRONMENT || 'sandbox'
+        environment: process.env.CASHFREE_ENVIRONMENT || 'sandbox',
+        aadhaarMockMode: process.env.MOCK_MODE === 'true'
     });
 });
 
@@ -39,5 +42,9 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Oruva Backend Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.CASHFREE_ENVIRONMENT || 'sandbox'}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health\n`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    console.log(`\n📋 Available APIs:`);
+    console.log(`   💰 Cashfree: http://localhost:${PORT}/api/*`);
+    console.log(`   🔐 Aadhaar KYC: http://localhost:${PORT}/api/aadhaar/*`);
+    console.log(`\n✅ Server ready!\n`);
 });
