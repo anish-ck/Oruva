@@ -17,13 +17,13 @@ export const Card = ({ children, variant = 'default', gradient = false, style, .
         );
     }
 
-    const cardStyle = variant === 'warning' 
+    const cardStyle = variant === 'warning'
         ? [styles.card, styles.cardWarning, style]
         : variant === 'success'
-        ? [styles.card, styles.cardSuccess, style]
-        : variant === 'accent'
-        ? [styles.card, styles.cardAccent, style]
-        : [styles.card, style];
+            ? [styles.card, styles.cardSuccess, style]
+            : variant === 'accent'
+                ? [styles.card, styles.cardAccent, style]
+                : [styles.card, style];
 
     return (
         <View style={cardStyle} {...props}>

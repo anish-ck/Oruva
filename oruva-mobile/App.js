@@ -1,16 +1,16 @@
 import 'react-native-get-random-values';
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { 
-    Alert, 
-    Clipboard, 
-    View, 
-    Text, 
-    TextInput, 
-    TouchableOpacity, 
-    ScrollView, 
-    StyleSheet, 
-    StatusBar 
+import {
+    Alert,
+    Clipboard,
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    ScrollView,
+    StyleSheet,
+    StatusBar
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -30,6 +30,9 @@ import AadhaarVerification from './components/AadhaarVerification';
 import { magic, loginWithEmail, getUserAddress, isLoggedIn, logout, getMagicProvider } from './src/services/magic';
 import aadhaarService from './src/services/aadhaar';
 import LoginScreen from './components/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+import BalancesScreen from './screens/BalancesScreen';
+import VaultScreen from './screens/VaultScreen';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -387,19 +390,54 @@ function AppContent() {
     // Show Aadhaar verification screen after Magic Link login
     if (showAadhaarVerification && !connected) {
         return (
-            
-    <GluestackUIProvider mode="dark">
-      <AadhaarVerification
-                email={email}
-                onVerificationComplete={handleAadhaarVerificationComplete}
-                onSkip={handleSkipAadhaar}
-            />
-    </GluestackUIProvider>
-  
+
+            <GluestackUIProvider mode="dark">
+                <AadhaarVerification
+                    email={email}
+                    onVerificationComplete={handleAadhaarVerificationComplete}
+                    onSkip={handleSkipAadhaar}
+                />
+            </GluestackUIProvider>
+
         );
     }
 
     // Handle screen navigation
+    if (currentScreen === 'balances' && connected) {
+        return (
+            <BalancesScreen
+                balances={balances}
+                vaultInfo={vaultInfo}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'vault' && connected) {
+        return (
+            <VaultScreen
+                vaultInfo={vaultInfo}
+                depositAmount={depositAmount}
+                setDepositAmount={setDepositAmount}
+                borrowAmount={borrowAmount}
+                setBorrowAmount={setBorrowAmount}
+                repayAmount={repayAmount}
+                setRepayAmount={setRepayAmount}
+                buyAmount={buyAmount}
+                setBuyAmount={setBuyAmount}
+                mintAmount={mintAmount}
+                setMintAmount={setMintAmount}
+                loading={loading}
+                onDeposit={handleDeposit}
+                onBorrow={handleBorrow}
+                onRepay={handleRepay}
+                onBuyOINR={handleBuyOINR}
+                onMintUSDC={handleMintUSDC}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
     if (currentScreen === 'profile' && connected) {
         return (
             <SafeAreaView style={{ flex: 1 }}>
@@ -481,312 +519,16 @@ function AppContent() {
         );
     }
 
+    // Main Home Screen
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
-            <ScrollView style={styles.scrollView}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.headerRow}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.headerTitle}>Your Vault</Text>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    Clipboard.setString(address);
-                                    Alert.alert('Copied!', 'Address copied to clipboard');
-                                }}
-                                style={styles.addressContainer}
-                            >
-                                <Text style={styles.address} numberOfLines={1}>
-                                    {address}
-                                </Text>
-                                <Text style={styles.copyIcon}>�</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.copyHint}>Tap to copy full address</Text>
-
-                            {/* KYC Status Badge */}
-                            {kycVerified && kycData ? (
-                                <View style={styles.kycBadge}>
-                                    <Text style={styles.kycBadgeText}>KYC Verified - {kycData.name}</Text>
-                                </View>
-                            ) : (
-                                <TouchableOpacity
-                                    style={styles.kycWarningBadge}
-                                    onPress={() => setCurrentScreen('profile')}
-                                >
-                                    <Text style={styles.kycWarningText}>Complete KYC to unlock all features</Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                        <View style={styles.headerButtons}>
-                            <TouchableOpacity
-                                style={styles.addINRButton}
-                                onPress={() => {
-                                    if (!kycVerified) {
-                                        Alert.alert(
-                                            'KYC Required',
-                                            'Please complete Aadhaar verification to add INR via Cashfree.',
-                                            [
-                                                { text: 'Cancel', style: 'cancel' },
-                                                {
-                                                    text: 'Complete KYC',
-                                                    onPress: () => setCurrentScreen('profile')
-                                                }
-                                            ]
-                                        );
-                                    } else {
-                                        setCurrentScreen('addINR');
-                                    }
-                                }}
-                                disabled={loading}
-                            >
-                                <Text style={styles.addINRButtonText}>₹</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.profileButton}
-                                onPress={() => setCurrentScreen('profile')}
-                                disabled={loading}
-                            >
-                                <Text style={styles.profileButtonText}>�</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.diagnosticButton}
-                                onPress={() => setCurrentScreen('diagnostic')}
-                                disabled={loading}
-                            >
-                                <Text style={styles.diagnosticButtonText}>⚙</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.refreshButton}
-                                onPress={handleRefresh}
-                                disabled={loading}
-                            >
-                                <Text style={styles.refreshButtonText}>
-                                    {loading ? '...' : '↻'}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-
-                {/* Gas Fee Info */}
-                <View style={[styles.card, { backgroundColor: '#fef3c7' }]}>
-                    <Text style={styles.cardTitle}>Need Gas Fees</Text>
-                    <Text style={styles.warningText}>
-                        To make transactions, you need FLOW tokens for gas fees.
-                    </Text>
-                    <Text style={styles.warningText}>
-                        Get free testnet FLOW from: https://faucet.flow.com/
-                    </Text>
-                    <Text style={[styles.warningText, { fontWeight: 'bold', marginTop: 5 }]}>
-                        Your address: {address}
-                    </Text>
-                </View>
-
-                {/* Balances */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Your Balances</Text>
-                    <View style={styles.balanceRow}>
-                        <Text style={styles.balanceLabel}>USDC:</Text>
-                        <Text style={styles.balanceValue}>{balances?.usdc || '0'}</Text>
-                    </View>
-                    <View style={styles.balanceRow}>
-                        <Text style={styles.balanceLabel}>oINR:</Text>
-                        <Text style={styles.balanceValue}>{balances?.oinr || '0'}</Text>
-                    </View>
-                </View>
-
-                {/* Vault Info */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Vault Status</Text>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Collateral:</Text>
-                        <Text style={styles.infoValue}>{vaultInfo?.collateral || '0'} USDC</Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Debt:</Text>
-                        <Text style={styles.infoValue}>{vaultInfo?.debt || '0'} oINR</Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Value:</Text>
-                        <Text style={styles.infoValue}>₹{vaultInfo?.collateralValueINR || '0'}</Text>
-                    </View>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Ratio:</Text>
-                        <Text style={styles.infoValue}>{vaultInfo?.ratio || '0'}%</Text>
-                    </View>
-                    <Text
-                        style={[
-                            styles.healthStatus,
-                            { color: vaultInfo?.isHealthy ? '#10b981' : '#ef4444' },
-                        ]}
-                    >
-                        {vaultInfo?.isHealthy ? 'Healthy' : 'Undercollateralized'}
-                    </Text>
-                </View>
-
-                {/* Mint Test USDC */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Mint Test USDC</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Amount (e.g., 1000)"
-                        keyboardType="numeric"
-                        value={mintAmount}
-                        onChangeText={setMintAmount}
-                        placeholderTextColor="#9ca3af"
-                    />
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleMintUSDC}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Mint USDC</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Deposit */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Deposit Collateral</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Amount (USDC)"
-                        keyboardType="numeric"
-                        value={depositAmount}
-                        onChangeText={setDepositAmount}
-                        placeholderTextColor="#9ca3af"
-                    />
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleDeposit}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Deposit</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Borrow */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Borrow oINR</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Amount (oINR)"
-                        keyboardType="numeric"
-                        value={borrowAmount}
-                        onChangeText={setBorrowAmount}
-                        placeholderTextColor="#9ca3af"
-                    />
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleBorrow}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Borrow</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Buy oINR */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Buy oINR</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Amount (oINR)"
-                        keyboardType="numeric"
-                        value={buyAmount}
-                        onChangeText={setBuyAmount}
-                        placeholderTextColor="#9ca3af"
-                    />
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleBuyOINR}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Buy oINR</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Repay */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Repay Debt</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Amount (oINR)"
-                        keyboardType="numeric"
-                        value={repayAmount}
-                        onChangeText={setRepayAmount}
-                        placeholderTextColor="#9ca3af"
-                    />
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={handleRepay}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Repay</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* QR Payments */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>UPI-Style QR Payments</Text>
-                    <Text style={styles.qrDescription}>
-                        Send and receive oINR instantly using QR codes
-                    </Text>
-
-                    {balances && parseFloat(balances.oinr) === 0 && (
-                        <View style={[styles.card, { backgroundColor: '#fff3cd', padding: 12, marginBottom: 12 }]}>
-                            <Text style={{ fontSize: 13, color: '#856404' }}>
-                                Tip: To send payments, you need oINR. Buy or borrow oINR first using the options above!
-                            </Text>
-                        </View>
-                    )}
-
-                    <View style={styles.qrButtonRow}>
-                        <TouchableOpacity
-                            style={[styles.qrButton, { backgroundColor: '#4CAF50' }]}
-                            onPress={() => setCurrentScreen('receive')}
-                            disabled={loading}
-                        >
-                            <Text style={styles.qrButtonIcon}>↓</Text>
-                            <Text style={styles.qrButtonText}>Receive</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.qrButton, { backgroundColor: '#2196F3' }]}
-                            onPress={() => setCurrentScreen('send')}
-                            disabled={loading}
-                        >
-                            <Text style={styles.qrButtonIcon}>↑</Text>
-                            <Text style={styles.qrButtonText}>Send</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {/* Earn Tab */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Earn Passive Income</Text>
-                    <Text style={styles.qrDescription}>
-                        Deposit USDC or oINR to earn 5% APY
-                    </Text>
-
-                    <TouchableOpacity
-                        style={[styles.button, { backgroundColor: '#FF9800' }]}
-                        onPress={() => setCurrentScreen('earn')}
-                        disabled={loading}
-                    >
-                        <Text style={styles.buttonText}>Open Earn Tab</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={{ height: 40 }} />
-            </ScrollView>
-
-            {loading && (
-                <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color="#6366f1" />
-                    <Text style={styles.loadingText}>Processing...</Text>
-                </View>
-            )}
-        </SafeAreaView>
+        <HomeScreen
+            address={address}
+            kycData={kycData}
+            kycVerified={kycVerified}
+            onNavigate={setCurrentScreen}
+            onProfilePress={() => setCurrentScreen('profile')}
+            onDisconnect={handleDisconnect}
+        />
     );
 }
 

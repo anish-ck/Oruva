@@ -281,13 +281,13 @@ export default function ProfileTab({ onLogout }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#F5F5F5',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#F5F5F5',
     },
     loadingText: {
         marginTop: 10,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     header: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#002E6E',
         padding: 30,
         alignItems: 'center',
         paddingTop: 60,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#FAFAFA',
         padding: 15,
         borderRadius: 8,
     },
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     },
     txItem: {
         padding: 12,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#FAFAFA',
         borderRadius: 8,
         marginBottom: 10,
     },
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     txValue: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#2196F3',
+        color: '#00BAF2',
     },
     txHash: {
         fontSize: 12,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
     },
     explorerButton: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#00BAF2',
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 8,

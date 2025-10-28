@@ -2,21 +2,21 @@ import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export const Button = ({ 
-    children, 
-    onPress, 
-    variant = 'primary', 
+export const Button = ({
+    children,
+    onPress,
+    variant = 'primary',
     size = 'medium',
     disabled = false,
     loading = false,
     icon,
     style,
-    ...props 
+    ...props
 }) => {
     if (variant === 'gradient') {
         return (
-            <TouchableOpacity 
-                onPress={onPress} 
+            <TouchableOpacity
+                onPress={onPress}
                 disabled={disabled || loading}
                 activeOpacity={0.8}
                 {...props}
@@ -80,7 +80,7 @@ export const Button = ({
     ];
 
     return (
-        <TouchableOpacity 
+        <TouchableOpacity
             style={buttonStyles}
             onPress={onPress}
             disabled={disabled || loading}

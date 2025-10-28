@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export const Badge = ({ 
-    children, 
+export const Badge = ({
+    children,
     variant = 'default',
     size = 'medium',
     style,
-    ...props 
+    ...props
 }) => {
     const badgeStyles = [
         styles.badge,

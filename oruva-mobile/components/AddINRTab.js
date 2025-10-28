@@ -367,7 +367,7 @@ export default function AddINRTab({ walletAddress, provider, magic, onBack }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#F5F5F5',
     },
     header: {
         backgroundColor: '#fff',
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 16,
-        color: '#4CAF50',
+        color: '#00BAF2',
         fontWeight: '600',
     },
     title: {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     input: {
-        backgroundColor: '#f8f8f8',
+        backgroundColor: '#FAFAFA',
         borderRadius: 10,
         padding: 15,
         fontSize: 24,
@@ -429,14 +429,14 @@ const styles = StyleSheet.create({
     },
     presetButton: {
         flex: 1,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#F0F0F0',
         padding: 12,
         borderRadius: 8,
         marginHorizontal: 5,
         alignItems: 'center',
     },
     presetButtonActive: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#00BAF2',
     },
     presetText: {
         fontSize: 14,
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     receiveBox: {
-        backgroundColor: '#E8F5E9',
+        backgroundColor: '#E8F4FD',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
@@ -455,16 +455,16 @@ const styles = StyleSheet.create({
     },
     receiveLabel: {
         fontSize: 12,
-        color: '#4CAF50',
+        color: '#00BAF2',
         marginBottom: 5,
     },
     receiveAmount: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#2E7D32',
+        color: '#002E6E',
     },
     payButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#00BAF2',
         padding: 18,
         borderRadius: 10,
         alignItems: 'center',
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     processingBox: {
         marginTop: 15,
         padding: 15,
-        backgroundColor: '#FFF9C4',
+        backgroundColor: '#E8F4FD',
         borderRadius: 10,
         flexDirection: 'row',
         alignItems: 'center',
@@ -494,23 +494,23 @@ const styles = StyleSheet.create({
     testInfo: {
         marginTop: 20,
         padding: 15,
-        backgroundColor: '#E3F2FD',
+        backgroundColor: '#E8F4FD',
         borderRadius: 10,
     },
     testInfoTitle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#1976D2',
+        color: '#002E6E',
         marginBottom: 8,
     },
     testInfoText: {
         fontSize: 13,
-        color: '#1976D2',
+        color: '#002E6E',
         marginBottom: 4,
     },
     testInfoTextSmall: {
         fontSize: 11,
-        color: '#1976D2',
+        color: '#002E6E',
     },
     bold: {
         fontWeight: 'bold',
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
         color: '#bbb',
     },
     transactionCard: {
-        backgroundColor: '#f8f8f8',
+        backgroundColor: '#FAFAFA',
         padding: 15,
         borderRadius: 10,
         marginBottom: 10,
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     transactionAmount: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#4CAF50',
+        color: '#00BAF2',
     },
     statusBadge: {
         paddingHorizontal: 10,
@@ -557,10 +557,10 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     statusSuccess: {
-        backgroundColor: '#C8E6C9',
+        backgroundColor: '#E8F4FD',
     },
     statusPending: {
-        backgroundColor: '#FFE082',
+        backgroundColor: '#FFF3E0',
     },
     statusText: {
         fontSize: 11,

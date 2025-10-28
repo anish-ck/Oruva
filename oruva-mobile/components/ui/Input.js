@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 
-export const Input = ({ 
-    label, 
-    error, 
+export const Input = ({
+    label,
+    error,
     helperText,
     leftIcon,
     rightIcon,
     style,
-    ...props 
+    ...props
 }) => {
     return (
         <View style={[styles.container, style]}>

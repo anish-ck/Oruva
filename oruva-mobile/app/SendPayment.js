@@ -241,10 +241,10 @@ export default function SendPayment({ wallet, onBack, onPaymentSuccess, oINRBala
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#F5F5F5',
     },
     header: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#002E6E',
         padding: 20,
         paddingTop: 40,
     },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     balanceInfo: {
-        backgroundColor: '#e3f2fd',
+        backgroundColor: '#E8F4FD',
         padding: 15,
         marginHorizontal: 16,
         marginTop: 10,
@@ -327,13 +327,13 @@ const styles = StyleSheet.create({
     },
     balanceLabel: {
         fontSize: 14,
-        color: '#1976d2',
+        color: '#002E6E',
         marginBottom: 5,
     },
     balanceAmount: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1565c0',
+        color: '#00BAF2',
     },
     warningText: {
         fontSize: 13,
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     confirmButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#00BAF2',
         padding: 18,
         borderRadius: 8,
         alignItems: 'center',
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     cancelButton: {
-        backgroundColor: '#f44336',
+        backgroundColor: '#F44336',
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     permissionButton: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#00BAF2',
         padding: 15,
         borderRadius: 8,
     },

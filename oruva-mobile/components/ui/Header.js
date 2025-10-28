@@ -2,14 +2,14 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export const Header = ({ 
-    title, 
+export const Header = ({
+    title,
     subtitle,
     onBackPress,
     rightAction,
     gradient = true,
     style,
-    ...props 
+    ...props
 }) => {
     if (gradient) {
         return (
