@@ -11,6 +11,8 @@ import {
   ScrollView,
   SafeAreaView
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { aadhaarService } from '../src/services/aadhaar';
 
 /**
@@ -103,13 +105,21 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
    */
   if (step === 3 && kycData) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.successContainer}>
-            <Text style={styles.successIcon}>✅</Text>
-            <Text style={styles.successTitle}>KYC Verified!</Text>
-            <Text style={styles.successSubtitle}>Your identity has been verified</Text>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* Success Header */}
+          <LinearGradient
+            colors={['#4CAF50', '#2E7D32']}
+            style={styles.header}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <MaterialCommunityIcons name="check-circle" size={64} color="#fff" />
+            <Text style={styles.title}>KYC Verified!</Text>
+            <Text style={styles.subtitle}>Your identity has been verified</Text>
+          </LinearGradient>
 
+          <View style={styles.successContent}>
             {kycData.photo && (
               <Image
                 source={{ uri: kycData.photo }}
@@ -156,24 +166,35 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
             <ActivityIndicator size="large" color="#4CAF50" />
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Header with Gradient */}
+        <LinearGradient
+          colors={['#002E6E', '#00509E']}
+          style={styles.header}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <MaterialCommunityIcons
+            name={step === 1 ? "shield-check" : "message-text"}
+            size={48}
+            color="#fff"
+          />
           <Text style={styles.title}>
-            {step === 1 ? '🔐 Aadhaar Verification' : '📱 Enter OTP'}
+            {step === 1 ? 'Aadhaar Verification' : 'Enter OTP'}
           </Text>
           <Text style={styles.subtitle}>
             {step === 1
-              ? 'Verify your identity with Aadhaar to continue'
-              : 'Enter the OTP sent to your Aadhaar-linked mobile number'
+              ? 'Verify your identity to continue'
+              : 'Enter the OTP sent to your mobile'
             }
           </Text>
-        </View>
+        </LinearGradient>
 
         {step === 1 ? (
           <View style={styles.formContainer}>
@@ -181,6 +202,7 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
             <TextInput
               style={styles.input}
               placeholder="XXXX XXXX XXXX"
+              placeholderTextColor="#999"
               value={formatAadhaar(aadhaarNumber)}
               onChangeText={(text) => setAadhaarNumber(text.replace(/\s/g, ''))}
               keyboardType="numeric"
@@ -193,11 +215,18 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
               onPress={handleGenerateOTP}
               disabled={loading}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Generate OTP</Text>
-              )}
+              <LinearGradient
+                colors={loading ? ['#9ca3af', '#9ca3af'] : ['#00BAF2', '#0086C9']}
+                style={styles.buttonInner}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Generate OTP</Text>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
 
             {onSkip && (
@@ -210,8 +239,9 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
             )}
 
             <View style={styles.infoBox}>
+              <MaterialCommunityIcons name="information" size={16} color="#1565C0" />
               <Text style={styles.infoText}>
-                ℹ️ OTP will be sent to your Aadhaar-linked mobile number
+                OTP will be sent to your Aadhaar-linked mobile number
               </Text>
             </View>
           </View>
@@ -221,6 +251,7 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
             <TextInput
               style={styles.otpInput}
               placeholder="000000"
+              placeholderTextColor="#999"
               value={otp}
               onChangeText={setOtp}
               keyboardType="numeric"
@@ -233,11 +264,18 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
               onPress={handleVerifyOTP}
               disabled={loading}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Verify OTP</Text>
-              )}
+              <LinearGradient
+                colors={loading ? ['#9ca3af', '#9ca3af'] : ['#00BAF2', '#0086C9']}
+                style={styles.buttonInner}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Verify OTP</Text>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -251,47 +289,57 @@ export default function AadhaarVerification({ email, onVerificationComplete, onS
             </TouchableOpacity>
 
             <View style={styles.infoBox}>
+              <MaterialCommunityIcons name="clock-outline" size={16} color="#1565C0" />
               <Text style={styles.infoText}>
-                ℹ️ OTP is valid for 10 minutes
+                OTP is valid for 10 minutes
               </Text>
             </View>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F5F5F5',
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
   },
   header: {
-    marginBottom: 30,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 10,
+    color: '#fff',
+    marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#6b7280',
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginTop: 8,
     textAlign: 'center',
-    lineHeight: 20,
   },
   formContainer: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 24,
+    margin: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -301,43 +349,45 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#333',
     marginBottom: 8,
   },
   input: {
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 16,
     fontSize: 18,
     marginBottom: 20,
-    backgroundColor: '#f9fafb',
-    color: '#1f2937',
+    backgroundColor: '#FAFAFA',
+    color: '#333',
     letterSpacing: 2,
     textAlign: 'center',
   },
   otpInput: {
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 20,
     fontSize: 24,
     marginBottom: 20,
-    backgroundColor: '#f9fafb',
-    color: '#1f2937',
+    backgroundColor: '#FAFAFA',
+    color: '#333',
     letterSpacing: 8,
     textAlign: 'center',
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#6366f1',
-    padding: 18,
     borderRadius: 12,
-    alignItems: 'center',
+    overflow: 'hidden',
     marginBottom: 12,
   },
   buttonDisabled: {
-    backgroundColor: '#9ca3af',
+    opacity: 0.6,
+  },
+  buttonInner: {
+    padding: 18,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -349,7 +399,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButtonText: {
-    color: '#6366f1',
+    color: '#00BAF2',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -359,46 +409,34 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   skipButtonText: {
-    color: '#9ca3af',
+    color: '#999',
     fontSize: 14,
   },
   infoBox: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E3F2FD',
     padding: 12,
     borderRadius: 8,
     marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   infoText: {
     fontSize: 12,
-    color: '#1e40af',
-    textAlign: 'center',
+    color: '#1565C0',
+    flex: 1,
   },
-  successContainer: {
+  successContent: {
+    padding: 20,
     alignItems: 'center',
-    paddingVertical: 40,
-  },
-  successIcon: {
-    fontSize: 80,
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#059669',
-    marginBottom: 8,
-  },
-  successSubtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    marginBottom: 30,
   },
   photo: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginBottom: 30,
-    borderWidth: 4,
-    borderColor: '#10b981',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginVertical: 24,
+    borderWidth: 3,
+    borderColor: '#4CAF50',
   },
   kycCard: {
     backgroundColor: '#fff',
@@ -418,19 +456,19 @@ const styles = StyleSheet.create({
   },
   kycLabel: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#666',
     fontWeight: '600',
     width: 100,
   },
   kycValue: {
     fontSize: 14,
-    color: '#1f2937',
+    color: '#333',
     flex: 1,
     fontWeight: '500',
   },
   redirectText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#666',
     marginBottom: 16,
   },
 });

@@ -123,13 +123,27 @@ export default function HomeScreen({
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.serviceRow}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.serviceScrollContainer}
+                    >
+                        <TouchableOpacity
+                            style={styles.serviceBox}
+                            onPress={() => onNavigate('mintusdc')}
+                        >
+                            <View style={styles.serviceBoxIcon}>
+                                <MaterialCommunityIcons name="cash-plus" size={40} color="#00509E" />
+                            </View>
+                            <Text style={styles.serviceBoxLabel}>Mint USDC</Text>
+                        </TouchableOpacity>
+
                         <TouchableOpacity
                             style={styles.serviceBox}
                             onPress={() => onNavigate('deposit')}
                         >
                             <View style={styles.serviceBoxIcon}>
-                                <MaterialCommunityIcons name="wallet-plus" size={32} color="#00509E" />
+                                <MaterialCommunityIcons name="wallet-plus" size={40} color="#00509E" />
                             </View>
                             <Text style={styles.serviceBoxLabel}>Deposit</Text>
                         </TouchableOpacity>
@@ -139,7 +153,7 @@ export default function HomeScreen({
                             onPress={() => onNavigate('borrow')}
                         >
                             <View style={styles.serviceBoxIcon}>
-                                <MaterialCommunityIcons name="hand-coin-outline" size={32} color="#00509E" />
+                                <MaterialCommunityIcons name="hand-coin-outline" size={40} color="#00509E" />
                             </View>
                             <Text style={styles.serviceBoxLabel}>Borrow</Text>
                         </TouchableOpacity>
@@ -149,7 +163,7 @@ export default function HomeScreen({
                             onPress={() => onNavigate('buy')}
                         >
                             <View style={styles.serviceBoxIcon}>
-                                <MaterialCommunityIcons name="cart-outline" size={32} color="#00509E" />
+                                <MaterialCommunityIcons name="cart-outline" size={40} color="#00509E" />
                             </View>
                             <Text style={styles.serviceBoxLabel}>Buy oINR</Text>
                         </TouchableOpacity>
@@ -159,11 +173,11 @@ export default function HomeScreen({
                             onPress={() => onNavigate('repay')}
                         >
                             <View style={styles.serviceBoxIcon}>
-                                <MaterialCommunityIcons name="credit-card-outline" size={32} color="#00509E" />
+                                <MaterialCommunityIcons name="credit-card-outline" size={40} color="#00509E" />
                             </View>
                             <Text style={styles.serviceBoxLabel}>Repay</Text>
                         </TouchableOpacity>
-                    </View>
+                    </ScrollView>
                 </Card>
 
                 {/* Promotional Cards */}
@@ -361,14 +375,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
+    serviceScrollContainer: {
+        paddingRight: 16,
+        gap: 16,
+    },
     serviceBox: {
         alignItems: 'center',
-        flex: 1,
+        width: 85,
     },
     serviceBoxIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 8,
+        width: 64,
+        height: 64,
+        borderRadius: 12,
         backgroundColor: '#E3F2FD',
         justifyContent: 'center',
         alignItems: 'center',
@@ -378,6 +396,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#1A1A1A',
         textAlign: 'center',
+        fontWeight: '500',
     },
     promoScrollView: {
         marginTop: 8,

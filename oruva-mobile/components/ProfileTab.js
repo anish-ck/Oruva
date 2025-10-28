@@ -306,7 +306,7 @@ export default function ProfileTab({ onLogout }) {
 
             {/* Logout Button */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <MaterialIcons name="logout" size={20} color="#FF3B30" />
+                <MaterialIcons name="logout" size={20} color="white" />
                 <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
 
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
         textAlign: 'right',
     },
     logoutButton: {
-        backgroundColor: '#F44336',
+        backgroundColor: '#002E6E',
         margin: 15,
         marginTop: 20,
         padding: 16,

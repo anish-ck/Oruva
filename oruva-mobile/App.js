@@ -33,6 +33,11 @@ import LoginScreen from './components/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import BalancesScreen from './screens/BalancesScreen';
 import VaultScreen from './screens/VaultScreen';
+import DepositScreen from './screens/DepositScreen';
+import BorrowScreen from './screens/BorrowScreen';
+import BuyOINRScreen from './screens/BuyOINRScreen';
+import RepayScreen from './screens/RepayScreen';
+import MintUSDCScreen from './screens/MintUSDCScreen';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -433,6 +438,71 @@ function AppContent() {
                 onRepay={handleRepay}
                 onBuyOINR={handleBuyOINR}
                 onMintUSDC={handleMintUSDC}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'deposit' && connected) {
+        return (
+            <DepositScreen
+                vaultInfo={vaultInfo}
+                depositAmount={depositAmount}
+                setDepositAmount={setDepositAmount}
+                loading={loading}
+                onDeposit={handleDeposit}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'mintusdc' && connected) {
+        return (
+            <MintUSDCScreen
+                vaultInfo={{ ...vaultInfo, address, usdcBalance: balances?.usdc }}
+                mintAmount={mintAmount}
+                setMintAmount={setMintAmount}
+                loading={loading}
+                onMintUSDC={handleMintUSDC}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'borrow' && connected) {
+        return (
+            <BorrowScreen
+                vaultInfo={vaultInfo}
+                borrowAmount={borrowAmount}
+                setBorrowAmount={setBorrowAmount}
+                loading={loading}
+                onBorrow={handleBorrow}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'buy' && connected) {
+        return (
+            <BuyOINRScreen
+                vaultInfo={{ ...vaultInfo, usdcBalance: balances?.usdc, oinrBalance: balances?.oinr }}
+                buyAmount={buyAmount}
+                setBuyAmount={setBuyAmount}
+                loading={loading}
+                onBuy={handleBuyOINR}
+                onBack={() => setCurrentScreen('home')}
+            />
+        );
+    }
+
+    if (currentScreen === 'repay' && connected) {
+        return (
+            <RepayScreen
+                vaultInfo={vaultInfo}
+                repayAmount={repayAmount}
+                setRepayAmount={setRepayAmount}
+                loading={loading}
+                onRepay={handleRepay}
                 onBack={() => setCurrentScreen('home')}
             />
         );

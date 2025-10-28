@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LoginScreen({
@@ -26,8 +26,13 @@ export default function LoginScreen({
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
                     <View style={styles.logoContent}>
-                        <Text style={styles.logoTitle}>Oruva</Text>
-                        <Text style={styles.logoSubtitle}>Banking on Blockchain</Text>
+                        <View style={styles.logoBanner}>
+                            <View style={styles.logoCircleSymbol}>
+                                <Text style={styles.logoO}>o:</Text>
+                            </View>
+                            <Text style={styles.oruvaText}>oruva</Text>
+                        </View>
+                        <Text style={styles.logoSubtitle}>Bridging India to Web3 Finance</Text>
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>Flow EVM Testnet</Text>
                         </View>
@@ -164,23 +169,47 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     logoContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 20,
+        paddingTop: 40,
     },
     logoContent: {
         alignItems: 'center',
-        gap: 8,
     },
-    logoTitle: {
-        fontSize: 42,
+    logoBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    logoCircleSymbol: {
+        width: 65,
+        height: 65,
+        borderRadius: 32.5,
+        borderWidth: 3,
+        borderColor: '#fff',
+        backgroundColor: 'transparent',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    logoO: {
+        fontSize: 32,
         fontWeight: 'bold',
         color: '#fff',
-        letterSpacing: 1,
+        marginLeft: -3,
+    },
+    oruvaText: {
+        fontSize: 48,
+        fontWeight: 'bold',
+        color: '#fff',
+        letterSpacing: 3,
     },
     logoSubtitle: {
-        fontSize: 16,
-        color: '#fff',
-        opacity: 0.95,
+        fontSize: 14,
+        color: 'rgba(255, 255, 255, 0.95)',
+        marginTop: 8,
+        fontWeight: '500',
     },
     badge: {
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
