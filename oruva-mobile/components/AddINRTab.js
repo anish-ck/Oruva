@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     Platform
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
     createPaymentOrder,
     openPaymentCheckout,
@@ -223,7 +224,12 @@ export default function AddINRTab({ walletAddress, provider, magic, onBack }) {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
         >
-            <View style={styles.header}>
+            <LinearGradient
+                colors={['#002E6E', '#00509E']}
+                style={styles.header}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
                 <View style={styles.headerRow}>
                     <TouchableOpacity onPress={onBack} style={styles.backButton}>
                         <Text style={styles.backButtonText}>← Back</Text>
@@ -232,7 +238,7 @@ export default function AddINRTab({ walletAddress, provider, magic, onBack }) {
                     <View style={styles.backButton} />
                 </View>
                 <Text style={styles.subtitle}>Deposit INR to receive oINR (1:1 ratio)</Text>
-            </View>
+            </LinearGradient>
 
             {/* Amount Input Section */}
             <View style={styles.section}>
@@ -370,11 +376,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5F5F5',
     },
     header: {
-        backgroundColor: '#fff',
         padding: 20,
         paddingTop: Platform.OS === 'ios' ? 60 : 40,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
     },
     headerRow: {
         flexDirection: 'row',
@@ -387,17 +390,17 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 16,
-        color: '#00BAF2',
+        color: '#fff',
         fontWeight: '600',
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#fff',
     },
     subtitle: {
         fontSize: 14,
-        color: '#666',
+        color: '#E3F2FD',
     },
     section: {
         backgroundColor: '#fff',

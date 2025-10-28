@@ -62,7 +62,7 @@ export default function HomeScreen({
 
                         <TouchableOpacity
                             style={styles.serviceItem}
-                            onPress={() => onNavigate('send')}
+                            onPress={() => onNavigate('addINR')}
                         >
                             <View style={[styles.serviceIcon, { backgroundColor: '#00509E' }]}>
                                 <FontAwesome5 name="university" size={28} color="white" />
@@ -72,12 +72,12 @@ export default function HomeScreen({
 
                         <TouchableOpacity
                             style={styles.serviceItem}
-                            onPress={() => onNavigate('receive')}
+                            onPress={() => onNavigate('earn')}
                         >
                             <View style={[styles.serviceIcon, { backgroundColor: '#00509E' }]}>
-                                <Ionicons name="person-outline" size={32} color="white" />
+                                <MaterialCommunityIcons name="piggy-bank" size={32} color="white" />
                             </View>
-                            <Text style={styles.serviceLabel}>To Self A/c</Text>
+                            <Text style={styles.serviceLabel}>Oruva Yield</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -166,35 +166,53 @@ export default function HomeScreen({
                     </View>
                 </Card>
 
-                {/* Earn Card */}
-                <Card style={styles.section}>
+                {/* Promotional Cards */}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.promoScrollView}
+                    contentContainerStyle={styles.promoContainer}
+                    snapToInterval={200}
+                    decelerationRate="fast"
+                >
                     <TouchableOpacity
-                        style={styles.earnCard}
+                        style={styles.promoCard}
                         onPress={() => onNavigate('earn')}
                     >
-                        <View>
-                            <Text style={styles.earnTitle}>Oruva Yield</Text>
-                            <Text style={styles.earnSubtitle}>Earn 5% APY on USDC & oINR</Text>
-                        </View>
-                        <Text style={styles.earnArrow}>→</Text>
-                    </TouchableOpacity>
-                </Card>
-
-                {/* Add INR Card */}
-                {kycVerified && (
-                    <Card style={styles.section}>
-                        <TouchableOpacity
-                            style={styles.earnCard}
-                            onPress={() => onNavigate('addINR')}
+                        <LinearGradient
+                            colors={['#6B4CFF', '#4C3FD6']}
+                            style={styles.promoGradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                         >
-                            <View>
-                                <Text style={styles.earnTitle}>Add Money</Text>
-                                <Text style={styles.earnSubtitle}>Add INR via Cashfree</Text>
+                            <View style={styles.promoIconContainer}>
+                                <MaterialCommunityIcons name="piggy-bank" size={40} color="#FFD700" />
                             </View>
-                            <Text style={styles.earnArrow}>→</Text>
-                        </TouchableOpacity>
-                    </Card>
-                )}
+                            <Text style={styles.promoTitle}>Oruva Yield</Text>
+                            <Text style={styles.promoSubtitle}>Earn 5% APY</Text>
+                            <Text style={styles.promoDescription}>On USDC & oINR deposits</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.promoCard}
+                        onPress={() => onNavigate('addINR')}
+                    >
+                        <LinearGradient
+                            colors={['#6B4CFF', '#4C3FD6']}
+                            style={styles.promoGradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                        >
+                            <View style={styles.promoIconContainer}>
+                                <MaterialCommunityIcons name="wallet-plus" size={40} color="#FFD700" />
+                            </View>
+                            <Text style={styles.promoTitle}>Add Money</Text>
+                            <Text style={styles.promoSubtitle}>Instant Deposit</Text>
+                            <Text style={styles.promoDescription}>Get oINR via Cashfree</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </ScrollView>
 
                 <View style={{ height: 100 }} />
             </ScrollView>
@@ -361,28 +379,49 @@ const styles = StyleSheet.create({
         color: '#1A1A1A',
         textAlign: 'center',
     },
-    earnCard: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#E8F5E9',
-        borderRadius: 12,
-        marginTop: -8,
+    promoScrollView: {
+        marginTop: 8,
     },
-    earnTitle: {
-        fontSize: 16,
+    promoContainer: {
+        paddingHorizontal: 15,
+        gap: 12,
+    },
+    promoCard: {
+        width: 180,
+        marginRight: 12,
+        borderRadius: 16,
+        overflow: 'hidden',
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+    },
+    promoGradient: {
+        padding: 16,
+        minHeight: 160,
+        justifyContent: 'space-between',
+    },
+    promoIconContainer: {
+        alignSelf: 'flex-start',
+        marginBottom: 8,
+    },
+    promoTitle: {
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#1A1A1A',
+        color: '#FFFFFF',
         marginBottom: 4,
     },
-    earnSubtitle: {
-        fontSize: 13,
-        color: '#666666',
+    promoSubtitle: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFD700',
+        marginBottom: 4,
     },
-    earnArrow: {
-        fontSize: 24,
-        color: '#4CAF50',
+    promoDescription: {
+        fontSize: 12,
+        color: '#E8E8FF',
+        opacity: 0.9,
     },
     scanButton: {
         position: 'absolute',

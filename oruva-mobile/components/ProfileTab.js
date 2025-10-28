@@ -15,6 +15,7 @@ import {
     Clipboard,
     RefreshControl,
 } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import walletService from '../src/services/wallet';
 import vaultService from '../src/services/vault';
 import { ethers } from 'ethers';
@@ -136,12 +137,22 @@ export default function ProfileTab({ onLogout }) {
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.avatarContainer}>
-                    <Text style={styles.avatar}>👤</Text>
+                    <Ionicons name="person" size={40} color="#00BAF2" />
                 </View>
                 <Text style={styles.headerTitle}>My Account</Text>
-                <Text style={styles.walletType}>
-                    {accountInfo?.isMagicWallet ? '🪄 Magic Wallet' : '🔐 Self-Custody Wallet'}
-                </Text>
+                <View style={styles.walletTypeContainer}>
+                    {accountInfo?.isMagicWallet ? (
+                        <>
+                            <MaterialCommunityIcons name="magic-staff" size={16} color="#E3F2FD" />
+                            <Text style={styles.walletType}>Magic Wallet</Text>
+                        </>
+                    ) : (
+                        <>
+                            <MaterialIcons name="security" size={16} color="#E3F2FD" />
+                            <Text style={styles.walletType}>Self-Custody Wallet</Text>
+                        </>
+                    )}
+                </View>
             </View>
 
             {/* Address Card */}
@@ -151,14 +162,17 @@ export default function ProfileTab({ onLogout }) {
                     <Text style={styles.address}>
                         {accountInfo?.address?.slice(0, 6)}...{accountInfo?.address?.slice(-4)}
                     </Text>
-                    <Text style={styles.copyIcon}>📋</Text>
+                    <MaterialIcons name="content-copy" size={20} color="#00BAF2" />
                 </TouchableOpacity>
                 <Text style={styles.copyHint}>Tap to copy full address</Text>
             </View>
 
             {/* Balances Card */}
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>💰 Token Balances</Text>
+                <View style={styles.cardTitleContainer}>
+                    <MaterialCommunityIcons name="wallet" size={20} color="#00BAF2" />
+                    <Text style={styles.cardTitleWithIcon}>Token Balances</Text>
+                </View>
                 <View style={styles.balanceRow}>
                     <Text style={styles.balanceLabel}>USDC:</Text>
                     <Text style={styles.balanceValue}>{balances.usdc}</Text>
@@ -171,7 +185,10 @@ export default function ProfileTab({ onLogout }) {
 
             {/* Vault Info Card */}
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>🏦 Vault Status</Text>
+                <View style={styles.cardTitleContainer}>
+                    <MaterialCommunityIcons name="bank" size={20} color="#00BAF2" />
+                    <Text style={styles.cardTitleWithIcon}>Vault Status</Text>
+                </View>
                 <View style={styles.vaultRow}>
                     <Text style={styles.vaultLabel}>Collateral (USDC):</Text>
                     <Text style={styles.vaultValue}>{accountInfo?.vaultInfo?.collateral}</Text>
@@ -195,21 +212,28 @@ export default function ProfileTab({ onLogout }) {
                 </View>
                 <View style={styles.healthIndicator}>
                     <Text style={styles.healthLabel}>Health:</Text>
-                    <Text
-                        style={
-                            accountInfo?.vaultInfo?.isHealthy
-                                ? styles.healthyText
-                                : styles.unhealthyText
-                        }
-                    >
-                        {accountInfo?.vaultInfo?.isHealthy ? '✅ Healthy' : '⚠️ At Risk'}
-                    </Text>
+                    <View style={styles.healthStatusContainer}>
+                        {accountInfo?.vaultInfo?.isHealthy ? (
+                            <>
+                                <MaterialIcons name="check-circle" size={16} color="#4CAF50" />
+                                <Text style={styles.healthyText}>Healthy</Text>
+                            </>
+                        ) : (
+                            <>
+                                <MaterialIcons name="warning" size={16} color="#F44336" />
+                                <Text style={styles.unhealthyText}>At Risk</Text>
+                            </>
+                        )}
+                    </View>
                 </View>
             </View>
 
             {/* Transaction History */}
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>📜 Recent Transactions</Text>
+                <View style={styles.cardTitleContainer}>
+                    <MaterialIcons name="receipt-long" size={20} color="#00BAF2" />
+                    <Text style={styles.cardTitleWithIcon}>Recent Transactions</Text>
+                </View>
                 {transactions.length === 0 ? (
                     <View style={styles.noTransactionsContainer}>
                         <Text style={styles.noTransactions}>No transaction history available</Text>
@@ -224,18 +248,27 @@ export default function ProfileTab({ onLogout }) {
                                 Alert.alert('Explorer', `View on Flowscan:\nhttps://evm-testnet.flowscan.io/address/${accountInfo?.address}`);
                             }}
                         >
-                            <Text style={styles.explorerButtonText}>View on Flowscan 🔗</Text>
+                            <MaterialIcons name="open-in-new" size={16} color="white" />
+                            <Text style={styles.explorerButtonText}>View on Flowscan</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
                     transactions.map((tx, index) => (
                         <View key={tx.hash} style={styles.txItem}>
                             <View style={styles.txHeader}>
-                                <Text style={styles.txType}>
-                                    {tx.from.toLowerCase() === accountInfo?.address?.toLowerCase()
-                                        ? '📤 Sent'
-                                        : '📥 Received'}
-                                </Text>
+                                <View style={styles.txTypeContainer}>
+                                    {tx.from.toLowerCase() === accountInfo?.address?.toLowerCase() ? (
+                                        <>
+                                            <MaterialIcons name="call-made" size={16} color="#F44336" />
+                                            <Text style={styles.txType}>Sent</Text>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MaterialIcons name="call-received" size={16} color="#4CAF50" />
+                                            <Text style={styles.txType}>Received</Text>
+                                        </>
+                                    )}
+                                </View>
                                 <Text style={styles.txValue}>{parseFloat(tx.value).toFixed(4)} FLOW</Text>
                             </View>
                             <Text style={styles.txHash}>
@@ -251,7 +284,10 @@ export default function ProfileTab({ onLogout }) {
 
             {/* Network Info */}
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>🌐 Network</Text>
+                <View style={styles.cardTitleContainer}>
+                    <MaterialCommunityIcons name="web" size={20} color="#00BAF2" />
+                    <Text style={styles.cardTitleWithIcon}>Network</Text>
+                </View>
                 <View style={styles.networkRow}>
                     <Text style={styles.networkLabel}>Chain:</Text>
                     <Text style={styles.networkValue}>Flow EVM Testnet</Text>
@@ -270,7 +306,8 @@ export default function ProfileTab({ onLogout }) {
 
             {/* Logout Button */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutText}>🚪 Logout</Text>
+                <MaterialIcons name="logout" size={20} color="#FF3B30" />
+                <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
 
             <View style={{ height: 40 }} />
@@ -309,14 +346,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
     },
-    avatar: {
-        fontSize: 40,
-    },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 5,
+    },
+    walletTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
     walletType: {
         fontSize: 14,
@@ -340,6 +379,17 @@ const styles = StyleSheet.create({
         color: '#333',
         marginBottom: 15,
     },
+    cardTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 15,
+    },
+    cardTitleWithIcon: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
     addressContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -352,9 +402,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'monospace',
         color: '#333',
-    },
-    copyIcon: {
-        fontSize: 20,
     },
     copyHint: {
         fontSize: 12,
@@ -411,6 +458,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#666',
     },
+    healthStatusContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
     healthyText: {
         fontSize: 14,
         fontWeight: 'bold',
@@ -431,6 +483,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 5,
+    },
+    txTypeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
     txType: {
         fontSize: 14,
@@ -475,6 +532,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
     explorerButtonText: {
         color: 'white',
@@ -503,7 +563,10 @@ const styles = StyleSheet.create({
         marginTop: 20,
         padding: 16,
         borderRadius: 12,
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
     },
     logoutText: {
         color: 'white',
