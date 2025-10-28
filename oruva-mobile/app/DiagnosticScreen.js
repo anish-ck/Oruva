@@ -162,7 +162,7 @@ export default function DiagnosticScreen({ onBack }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: '#2196F3' }]}
+                    style={[styles.button, { backgroundColor: '#00BAF2' }]}
                     onPress={checkOINRContract}
                     disabled={loading}
                 >
@@ -172,7 +172,7 @@ export default function DiagnosticScreen({ onBack }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: '#FF9800' }]}
+                    style={[styles.button, { backgroundColor: '#002E6E' }]}
                     onPress={checkVaultEngine}
                     disabled={loading}
                 >
@@ -194,10 +194,10 @@ export default function DiagnosticScreen({ onBack }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#F5F5F5',
     },
     header: {
-        backgroundColor: '#9C27B0',
+        backgroundColor: '#002E6E',
         padding: 20,
         paddingTop: 40,
     },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     button: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#00BAF2',
         padding: 18,
         borderRadius: 8,
         marginBottom: 12,

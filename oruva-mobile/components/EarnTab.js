@@ -303,13 +303,13 @@ export default function EarnTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F5F5F5',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F5F5F5',
   },
   loadingText: {
     marginTop: 10,
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   header: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#002E6E',
     padding: 20,
     alignItems: 'center',
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#E3F2FD',
+    color: '#E8F4FD',
     marginTop: 5,
   },
   vaultSelector: {
@@ -346,8 +346,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   vaultButtonActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#00BAF2',
+    backgroundColor: '#E8F4FD',
   },
   vaultButtonText: {
     fontSize: 16,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   vaultButtonTextActive: {
-    color: '#2196F3',
+    color: '#00BAF2',
     fontWeight: 'bold',
   },
   statsContainer: {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
   },
   balanceCard: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#E8F4FD',
     padding: 15,
     margin: 15,
     borderRadius: 10,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   balanceValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF9800',
+    color: '#00BAF2',
   },
   section: {
     backgroundColor: 'white',
@@ -437,13 +437,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#00BAF2',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonSecondary: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#002E6E',
   },
   buttonSuccess: {
     backgroundColor: '#4CAF50',
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   infoCard: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#E8F4FD',
     padding: 15,
     margin: 15,
     borderRadius: 10,
