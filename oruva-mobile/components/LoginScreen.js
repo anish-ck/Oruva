@@ -26,12 +26,7 @@ export default function LoginScreen({
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
                     <View style={styles.logoContent}>
-                        <View style={styles.logoBanner}>
-                            <View style={styles.logoCircleSymbol}>
-                                <Text style={styles.logoO}>o:</Text>
-                            </View>
-                            <Text style={styles.oruvaText}>oruva</Text>
-                        </View>
+                        <Text style={styles.oruvaText}>oruva</Text>
                         <Text style={styles.logoSubtitle}>Bridging India to Web3 Finance</Text>
                         <View style={styles.badge}>
                             <Text style={styles.badgeText}>Flow EVM Testnet</Text>
@@ -177,33 +172,13 @@ const styles = StyleSheet.create({
     logoContent: {
         alignItems: 'center',
     },
-    logoBanner: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    logoCircleSymbol: {
-        width: 65,
-        height: 65,
-        borderRadius: 32.5,
-        borderWidth: 3,
-        borderColor: '#fff',
-        backgroundColor: 'transparent',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    logoO: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginLeft: -3,
-    },
     oruvaText: {
-        fontSize: 48,
-        fontWeight: 'bold',
+        fontSize: 72,
+        fontWeight: '300',
         color: '#fff',
-        letterSpacing: 3,
+        letterSpacing: -2,
+        marginBottom: 8,
+        textTransform: 'lowercase',
     },
     logoSubtitle: {
         fontSize: 14,

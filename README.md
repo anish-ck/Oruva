@@ -5,7 +5,67 @@
 ![React Native](https://img.shields.io/badge/React%20Native-Expo-purple)
 ![Solidity](https://img.shields.io/badge/Solidity-Smart%20Contracts-orange)
 
-Oruva is a decentralized platform for minting and managing INR-backed stablecoins (oINR) on the Flow EVM blockchain. The platform combines DeFi primitives with traditional payment rails to enable seamless INR transactions in the crypto ecosystem.
+**Oruva** is a decentralized platform for minting and managing INR-backed stablecoins (oINR) built on **Flow EVM Testnet**. The platform combines DeFi primitives with traditional payment rails to enable seamless INR transactions in the crypto ecosystem.
+
+> 🌊 **Built on Flow Blockchain** | Network: **Testnet** | Chain ID: **545** | [View Contracts](https://evm-testnet.flowscan.io/)
+
+## 🌊 Built on Flow Blockchain
+
+This project is deployed on **Flow EVM Testnet** - Flow's Ethereum Virtual Machine compatible execution environment.
+
+### Network Information
+
+| Property | Value |
+|----------|-------|
+| **Blockchain** | Flow |
+| **Network** | EVM Testnet |
+| **Chain ID** | 545 |
+| **RPC URL** | https://testnet.evm.nodes.onflow.org |
+| **Explorer** | https://evm-testnet.flowscan.io/ |
+| **Currency** | FLOW |
+| **Faucet** | https://testnet-faucet.onflow.org/ |
+
+### 📜 Deployed Smart Contract Addresses
+
+All contracts are deployed and verified on **Flow EVM Testnet**:
+
+| Contract | Address | Description |
+|----------|---------|-------------|
+| **OINRToken** | `0x13d855720E87eC59BFC4E27851027f5D8D8E9Eae` | oINR Stablecoin (ERC20) |
+| **VaultManager** | `0x5F1311808ED97661D5b31F4C67637D8952a54cc0` | User vault operations |
+| **VaultEngine** | `0xa9255087b8d1B75456eA5d4fc272B884E7A7AE8a` | Core CDP accounting |
+| **CollateralJoin** | `0x0b54a6bf84108d7C8d5a2296Df4a2264b1f7Fd66` | Collateral gateway |
+| **PriceOracle** | `0xe5cCA233Db9655D8C1a64F74e1d5Bb1253e80f99` | USDC/INR price feed |
+| **MockUSDC** | `0x5Fda84f0d0985e346ff0fe13dFd7760a9Ff1Ed43` | Test USDC token |
+| **USDCYieldVault** | `0x0009f72e3c176163037807f6365695DCeED2a09B` | USDC staking (5% APY) |
+| **OINRYieldVault** | `0x5923227b1E40fEbDA88B5231a573069F9669Fb9a` | oINR staking (5% APY) |
+
+> 📝 **Note:** Complete contract details available in [`CONTRACT_ADDRESSES.json`](CONTRACT_ADDRESSES.json)
+
+### Why Flow?
+
+- ✅ **EVM Compatible** - Run Solidity contracts without modification
+- ✅ **Low Gas Fees** - Significantly cheaper than Ethereum mainnet
+- ✅ **Fast Finality** - Quick transaction confirmation
+- ✅ **Developer Friendly** - Full Ethereum tooling support
+- ✅ **Scalable** - High throughput for DeFi applications
+
+### 🔍 Verify Contracts on Explorer
+
+View and interact with deployed contracts:
+
+- **OINRToken**: [View on Explorer](https://evm-testnet.flowscan.io/address/0x13d855720E87eC59BFC4E27851027f5D8D8E9Eae)
+- **VaultManager**: [View on Explorer](https://evm-testnet.flowscan.io/address/0x5F1311808ED97661D5b31F4C67637D8952a54cc0)
+- **VaultEngine**: [View on Explorer](https://evm-testnet.flowscan.io/address/0xa9255087b8d1B75456eA5d4fc272B884E7A7AE8a)
+- **USDCYieldVault**: [View on Explorer](https://evm-testnet.flowscan.io/address/0x0009f72e3c176163037807f6365695DCeED2a09B)
+- **OINRYieldVault**: [View on Explorer](https://evm-testnet.flowscan.io/address/0x5923227b1E40fEbDA88B5231a573069F9669Fb9a)
+
+### Mainnet Deployment (Future)
+
+When ready for production, contracts will be deployed to:
+- **Network:** Flow EVM Mainnet
+- **Chain ID:** 747
+- **RPC URL:** https://mainnet.evm.nodes.onflow.org
 
 ## 🌟 Features
 
@@ -180,20 +240,48 @@ npm start
 - **Vector Icons** - MaterialIcons, Ionicons, FontAwesome5
 - **Card-based Layout** - Clean component structure
 
-## 📋 Contract Addresses (Flow EVM Testnet)
+## 📋 Contract Addresses & Verification
 
-Update `CONTRACT_ADDRESSES.json` with your deployed addresses:
+All smart contracts are deployed on **Flow EVM Testnet (Chain ID: 545)**.
+
+### How to Verify Deployed Contracts
+
+After deployment, contract addresses are stored in `CONTRACT_ADDRESSES.json`:
 
 ```json
 {
-  "OINRToken": "0x...",
-  "VaultEngine": "0x...",
-  "VaultManager": "0x...",
-  "CollateralJoin": "0x...",
-  "Oracle": "0x...",
-  "USDCYieldVault": "0x...",
-  "OINRYieldVault": "0x..."
+  "network": "Flow EVM Testnet",
+  "chainId": 545,
+  "deployedAt": "2025-10-28",
+  "contracts": {
+    "OINRToken": "0x...",
+    "VaultEngine": "0x...",
+    "VaultManager": "0x...",
+    "CollateralJoin": "0x...",
+    "Oracle": "0x...",
+    "USDC": "0x...",
+    "USDCYieldVault": "0x...",
+    "OINRYieldVault": "0x..."
+  }
 }
+```
+
+### View on Flow Explorer
+
+After deployment, verify contracts at:
+```
+https://evm-testnet.flowscan.io/address/<CONTRACT_ADDRESS>
+```
+
+### Interact with Contracts
+
+```bash
+# Using cast (Foundry)
+cast call <CONTRACT_ADDRESS> "balanceOf(address)(uint256)" <YOUR_ADDRESS> --rpc-url https://testnet.evm.nodes.onflow.org
+
+# Using ethers.js
+const contract = new ethers.Contract(address, abi, provider);
+const balance = await contract.balanceOf(userAddress);
 ```
 
 ## 🔐 Security
