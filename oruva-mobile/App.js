@@ -38,6 +38,7 @@ import BorrowScreen from './screens/BorrowScreen';
 import BuyOINRScreen from './screens/BuyOINRScreen';
 import RepayScreen from './screens/RepayScreen';
 import MintUSDCScreen from './screens/MintUSDCScreen';
+import AnalyticsScreen from './screens/AnalyticsScreen';
 
 function AppContent() {
     const [connected, setConnected] = useState(false);
@@ -52,7 +53,7 @@ function AppContent() {
     const [kycVerified, setKycVerified] = useState(false);
 
     // Screen navigation
-    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn', 'profile', 'addINR'
+    const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'receive', 'send', 'diagnostic', 'earn', 'profile', 'addINR', 'analytics'
 
     // Input states
     const [depositAmount, setDepositAmount] = useState('');
@@ -567,6 +568,15 @@ function AppContent() {
                 onBack={() => setCurrentScreen('home')}
                 onPaymentSuccess={handleQRPayment}
                 oINRBalance={balances?.oinr}
+            />
+        );
+    }
+
+    if (currentScreen === 'analytics' && connected) {
+        return (
+            <AnalyticsScreen
+                address={address}
+                onBack={() => setCurrentScreen('home')}
             />
         );
     }

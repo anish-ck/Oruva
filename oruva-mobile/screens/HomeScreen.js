@@ -104,6 +104,16 @@ export default function HomeScreen({
 
                         <TouchableOpacity
                             style={styles.secondaryItem}
+                            onPress={() => onNavigate('analytics')}
+                        >
+                            <View style={[styles.secondaryIcon, { backgroundColor: '#E3F2FD' }]}>
+                                <MaterialCommunityIcons name="chart-line" size={28} color="#00509E" />
+                            </View>
+                            <Text style={styles.secondaryLabel}>Analytics</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.secondaryItem}
                             onPress={() => onNavigate('vault')}
                         >
                             <View style={[styles.secondaryIcon, { backgroundColor: '#E3F2FD' }]}>
