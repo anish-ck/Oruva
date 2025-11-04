@@ -1,4 +1,13 @@
+
 # Oruva - Decentralized INR Stablecoin Platform
+---
+
+## 🎥 **[ORUVA DEMO VIDEO](https://youtu.be/L5iwHGRkXf8?si=_QapYxfBaZ05oB9g)**
+
+### 📺 **Watch the Complete Demo** → **[Click Here to Watch](https://youtu.be/L5iwHGRkXf8?si=_QapYxfBaZ05oB9g)** 🎬
+
+---
+
 
 ![Oruva](https://img.shields.io/badge/Oruva-DeFi%20Platform-blue)
 ![Flow EVM](https://img.shields.io/badge/Flow-EVM%20Testnet-green)
@@ -6,6 +15,8 @@
 ![Solidity](https://img.shields.io/badge/Solidity-Smart%20Contracts-orange)
 
 **Oruva** is a decentralized platform for minting and managing INR-backed stablecoins (oINR) built on **Flow EVM Testnet**. The platform combines DeFi primitives with traditional payment rails to enable seamless INR transactions in the crypto ecosystem.
+
+
 
 > 🌊 **Built on Flow Blockchain** | Network: **Testnet** | Chain ID: **545** | [View Contracts](https://evm-testnet.flowscan.io/)
 

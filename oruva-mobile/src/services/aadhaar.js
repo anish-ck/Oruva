@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // Update this URL based on your backend
-const API_BASE_URL = 'http://10.81.135.231:3000/api/aadhaar';
+const API_BASE_URL = 'http://172.16.28.102:3000/api/aadhaar';
 // For testing on physical device, use your computer's IP:
-// const API_BASE_URL = 'http://192.168.x.x:3000/api/aadhaar';
+// Previous IP: http://10.81.135.231:3000/api/aadhaar
 // For Expo: const API_BASE_URL = 'http://YOUR_IP:3000/api/aadhaar';
 
 export const aadhaarService = {

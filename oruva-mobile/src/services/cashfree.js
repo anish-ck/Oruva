@@ -3,7 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 
 // Backend API URL - Update this to your backend URL
-const BACKEND_URL = 'https://subpermanently-doughy-bonny.ngrok-free.dev/api'; // ngrok URL for testing
+const BACKEND_URL = 'https://subpermanently-doughy-bonny.ngrok-free.dev/api'; // ngrok URL for Cashfree webhooks
 
 // Configure axios to handle ngrok
 axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
